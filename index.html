@@ -1,0 +1,3621 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChromaSim — Chromatography Analysis Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CSS CUSTOM PROPERTIES — DUAL THEME
+   ============================================================ */
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #151d2e;
+  --bg-card-hover: #1a2540;
+  --bg-glass: rgba(20,30,55,0.7);
+  --border: rgba(99,179,237,0.15);
+  --border-bright: rgba(99,179,237,0.4);
+  --text-primary: #e8edf5;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --accent3: #34d399;
+  --accent4: #fb923c;
+  --accent-glow: rgba(56,189,248,0.18);
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --success: #4ade80;
+  --gradient-hero: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 50%, #0a1628 100%);
+  --shadow-card: 0 4px 32px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 30px rgba(56,189,248,0.15);
+  --font-mono: 'Space Mono', monospace;
+  --font-body: 'DM Sans', sans-serif;
+  --font-serif: 'Crimson Pro', serif;
+  --radius: 12px;
+  --radius-sm: 6px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f0f4fc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8faff;
+  --bg-glass: rgba(255,255,255,0.85);
+  --border: rgba(56,100,220,0.12);
+  --border-bright: rgba(56,100,220,0.35);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --accent: #0369a1;
+  --accent2: #4f46e5;
+  --accent3: #059669;
+  --accent4: #ea580c;
+  --accent-glow: rgba(3,105,161,0.1);
+  --danger: #dc2626;
+  --warn: #d97706;
+  --success: #16a34a;
+  --gradient-hero: linear-gradient(135deg, #e8f0fe 0%, #dbeafe 50%, #ede9fe 100%);
+  --shadow-card: 0 2px 20px rgba(0,0,0,0.08);
+  --shadow-glow: 0 0 30px rgba(3,105,161,0.08);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  transition: background var(--transition), color var(--transition);
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   HEADER / NAVBAR
+   ============================================================ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.nav-brand .logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.nav-brand .brand-text {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.nav-brand .brand-sub {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: block;
+  margin-top: -2px;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+}
+
+.nav-tabs li a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.nav-tabs li a:hover {
+  color: var(--text-primary);
+  background: var(--accent-glow);
+  border-color: var(--border-bright);
+}
+
+.nav-tabs li a.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+  border-color: var(--border-bright);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle {
+  width: 44px; height: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  transition: transform var(--transition);
+}
+
+[data-theme="light"] .theme-toggle::after {
+  transform: translateX(20px);
+  background: var(--accent4);
+}
+
+.theme-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero {
+  background: var(--gradient-hero);
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  background: var(--accent-glow);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat .value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+}
+
+.hero-stat .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   MAIN CONTENT AREA / TABS
+   ============================================================ */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition);
+}
+
+.card:hover {
+  border-color: var(--border-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+.card-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.section-heading {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.section-sub {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================
+   CALLOUT BOXES
+   ============================================================ */
+.callout {
+  border-left: 3px solid;
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 1rem 0;
+  background: var(--bg-secondary);
+}
+
+.callout.info { border-color: var(--accent); background: rgba(56,189,248,0.06); }
+.callout.concept { border-color: var(--accent2); background: rgba(129,140,248,0.06); }
+.callout.experiment { border-color: var(--accent3); background: rgba(52,211,153,0.06); }
+.callout.didyouknow { border-color: var(--warn); background: rgba(251,191,36,0.06); }
+.callout.summary { border-color: var(--accent4); background: rgba(251,146,60,0.06); }
+.callout.formula { border-color: var(--accent3); background: rgba(52,211,153,0.06); font-family: var(--font-mono); }
+
+.callout-title {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.callout.info .callout-title { color: var(--accent); }
+.callout.concept .callout-title { color: var(--accent2); }
+.callout.experiment .callout-title { color: var(--accent3); }
+.callout.didyouknow .callout-title { color: var(--warn); }
+.callout.summary .callout-title { color: var(--accent4); }
+.callout.formula .callout-title { color: var(--accent3); }
+
+/* ============================================================
+   COLLAPSIBLE NOTES
+   ============================================================ */
+.collapsible-group { margin-bottom: 0.75rem; }
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.collapsible-header:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-bright);
+}
+
+.collapsible-header.open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+  background: var(--bg-card-hover);
+  border-color: var(--border-bright);
+}
+
+.collapsible-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.collapsible-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--border-bright);
+  padding: 2px 8px;
+  border-radius: 4px;
+  min-width: 36px;
+  text-align: center;
+}
+
+.collapsible-arrow {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+}
+
+.collapsible-header.open .collapsible-arrow { transform: rotate(180deg); }
+
+.collapsible-body {
+  display: none;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.collapsible-body.open { display: block; }
+
+.collapsible-body p { margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.925rem; }
+.collapsible-body h4 { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin: 1rem 0 0.5rem; }
+.collapsible-body ul, .collapsible-body ol { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.collapsible-body li { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.3rem; }
+
+/* ============================================================
+   SIMULATOR LAYOUT
+   ============================================================ */
+.sim-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.sim-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  position: sticky;
+  top: 80px;
+}
+
+.sim-canvas-area {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* Simulator Tabs */
+.sim-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+}
+
+.sim-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.sim-tab-btn:hover { color: var(--text-primary); background: var(--accent-glow); }
+
+.sim-tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.sim-screen { display: none; }
+.sim-screen.active { display: flex; gap: 1.5rem; }
+
+/* ============================================================
+   CANVAS CONTAINERS
+   ============================================================ */
+canvas {
+  display: block;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.canvas-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.canvas-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+.ctrl-group { margin-bottom: 1.25rem; }
+
+.ctrl-label {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ctrl-select, .ctrl-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  transition: all var(--transition);
+}
+
+.ctrl-select:focus, .ctrl-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.ctrl-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ctrl-checkbox-row input[type="checkbox"] {
+  width: 14px; height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.ctrl-checkbox-row label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent2);
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--border-bright);
+}
+
+.btn-secondary:hover {
+  background: var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   RF DATA TABLE & BIDIRECTIONAL
+   ============================================================ */
+.rf-table-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+table.rf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+table.rf-table th {
+  background: var(--bg-secondary);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-bright);
+}
+
+table.rf-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+
+table.rf-table tr:hover td {
+  background: var(--accent-glow);
+  color: var(--text-primary);
+}
+
+table.rf-table tr.highlighted td {
+  background: var(--accent-glow);
+  color: var(--accent);
+  border-left: 2px solid var(--accent);
+}
+
+.color-swatch {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ============================================================
+   INFO PANEL (Rf details)
+   ============================================================ */
+.rf-detail-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  display: none;
+}
+
+.rf-detail-panel.visible { display: block; }
+
+.rf-detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.rf-detail-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.rf-detail-key { color: var(--text-muted); }
+.rf-detail-val { color: var(--accent); }
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz-container { max-width: 720px; margin: 0 auto; }
+
+.quiz-question {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.quiz-q-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-q-text {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--bg-secondary);
+}
+
+.quiz-option:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.quiz-option.selected { border-color: var(--accent2); background: rgba(129,140,248,0.1); }
+.quiz-option.correct { border-color: var(--success); background: rgba(74,222,128,0.1); }
+.quiz-option.wrong { border-color: var(--danger); background: rgba(248,113,113,0.1); }
+
+.quiz-option input[type="radio"] { accent-color: var(--accent); }
+
+.quiz-feedback {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(74,222,128,0.1); border: 1px solid var(--success); color: var(--success); }
+.quiz-feedback.wrong { background: rgba(248,113,113,0.1); border: 1px solid var(--danger); color: var(--danger); }
+
+.quiz-score-board {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+}
+
+.score-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: 4px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+/* ============================================================
+   SUBSTANCE LIBRARY
+   ============================================================ */
+.substance-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.substance-search input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  transition: all var(--transition);
+}
+
+.substance-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.substance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.substance-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.substance-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.substance-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.substance-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.substance-type {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.substance-type.amino { color: var(--accent2); border-color: var(--accent2); background: rgba(129,140,248,0.1); }
+.substance-type.pigment { color: var(--accent3); border-color: var(--accent3); background: rgba(52,211,153,0.1); }
+.substance-type.dye { color: var(--accent4); border-color: var(--accent4); background: rgba(251,146,60,0.1); }
+.substance-type.organic { color: var(--accent); border-color: var(--accent); background: rgba(56,189,248,0.1); }
+
+.substance-rf {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-top: 8px;
+}
+
+.substance-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   CALCULATION SECTION
+   ============================================================ */
+.calc-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.calc-row {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.calc-field {
+  flex: 1;
+  min-width: 140px;
+}
+
+.calc-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.calc-field input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: all var(--transition);
+}
+
+.calc-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.calc-result {
+  background: var(--accent-glow);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  margin-top: 0.5rem;
+  display: none;
+}
+
+.calc-result.show { display: block; }
+
+.calc-result .result-val {
+  font-size: 1.5rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.calc-result .result-step {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ============================================================
+   REFERENCES
+   ============================================================ */
+.ref-list { list-style: none; }
+.ref-list li {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: background var(--transition);
+}
+
+.ref-list li:hover { background: var(--accent-glow); border-radius: var(--radius-sm); }
+
+.ref-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  min-width: 36px;
+  padding: 2px 6px;
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ref-content { font-size: 0.875rem; color: var(--text-secondary); }
+.ref-content a { color: var(--accent); text-decoration: none; }
+.ref-content a:hover { text-decoration: underline; }
+
+/* ============================================================
+   GRID LAYOUTS
+   ============================================================ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+@media (max-width: 900px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .sim-layout { grid-template-columns: 1fr; }
+  .nav-tabs { display: none; }
+}
+
+@media (max-width: 600px) {
+  .grid-3 { grid-template-columns: 1fr; }
+  .main-content { padding: 1rem; }
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
+  50% { box-shadow: 0 0 30px rgba(56,189,248,0.3); }
+}
+
+@keyframes scanning {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
+}
+
+.animated-entry { animation: fadeInUp 0.4s ease both; }
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse-glow 2s infinite;
+}
+
+.status-dot.idle { background: var(--text-muted); animation: none; }
+.status-dot.running { background: var(--accent); }
+
+/* Progress bar */
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  transition: width 0.1s linear;
+  width: 0%;
+}
+
+/* ============================================================
+   FORMULA DISPLAY
+   ============================================================ */
+.formula-display {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--accent3);
+  padding: 0.75rem 1rem;
+  background: rgba(52,211,153,0.05);
+  border: 1px solid rgba(52,211,153,0.2);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  margin: 0.5rem 0;
+}
+
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  font-size: 0.9em;
+  margin: 0 4px;
+}
+
+.fraction .numer {
+  border-bottom: 1px solid currentColor;
+  padding: 0 4px;
+}
+.fraction .denom { padding: 0 4px; }
+
+/* ============================================================
+   MOBILE NAV
+   ============================================================ */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 999;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 8px;
+}
+
+@media (max-width: 900px) {
+  .mobile-nav { display: flex; gap: 4px; justify-content: space-around; }
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    transition: all var(--transition);
+  }
+  .mobile-nav-btn.active { color: var(--accent); }
+  .mobile-nav-btn span.icon { font-size: 1.2rem; }
+  body { padding-bottom: 80px; }
+}
+
+/* GLC specific */
+.glc-readout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.glc-readout-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.glc-readout-item .glc-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.glc-readout-item .glc-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Tag badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-objective { background: rgba(56,189,248,0.15); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
+.badge-practical { background: rgba(52,211,153,0.15); color: var(--accent3); border: 1px solid rgba(52,211,153,0.3); }
+.badge-note { background: rgba(251,191,36,0.15); color: var(--warn); border: 1px solid rgba(251,191,36,0.3); }
+
+/* Objectives grid in notes */
+.objectives-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.obj-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.obj-item::before {
+  content: '✓';
+  color: var(--accent3);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+/* Substance detail modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 540px;
+  width: 100%;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+  animation: fadeInUp 0.25s ease both;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.modal-close:hover { color: var(--text-primary); }
+
+/* Notification toast */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  right: 1rem;
+  z-index: 3000;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all var(--transition);
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-brand" href="#" onclick="switchTab('home'); return false;">
+    <div class="logo-icon">⚗</div>
+    <div>
+      <span class="brand-text">ChromaSim</span>
+      <span class="brand-sub">CAPE Chemistry Suite</span>
+    </div>
+  </a>
+  <ul class="nav-tabs" id="navTabs">
+    <li><a class="active" onclick="switchTab('home')" data-tab="home">🏠 Home</a></li>
+    <li><a onclick="switchTab('notes')" data-tab="notes">📖 Notes</a></li>
+    <li><a onclick="switchTab('simulator')" data-tab="simulator">🔬 Simulator</a></li>
+    <li><a onclick="switchTab('calculator')" data-tab="calculator">🧮 Calculations</a></li>
+    <li><a onclick="switchTab('library')" data-tab="library">🗂 Library</a></li>
+    <li><a onclick="switchTab('quiz')" data-tab="quiz">🧩 Quiz</a></li>
+    <li><a onclick="switchTab('references')" data-tab="references">📚 References</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="theme-label" id="themeLbl">DARK</span>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme"></button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     TAB: HOME
+     ============================================================ -->
+<div id="tab-home" class="tab-panel active">
+  <div class="hero">
+    <div class="hero-badge">⚗ CAPE Chemistry — Unit 2, Module 2</div>
+    <h1>Chromatographic <em>Methods</em><br>of Separation</h1>
+    <p>An interactive learning suite for university and advanced-level students. Explore, simulate, and master chromatography.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="value">4</span><span class="label">Simulator Types</span></div>
+      <div class="hero-stat"><span class="value">40+</span><span class="label">Real Substances</span></div>
+      <div class="hero-stat"><span class="value">25</span><span class="label">Quiz Questions</span></div>
+      <div class="hero-stat"><span class="value">8.1–8.6</span><span class="label">CAPE Objectives</span></div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="grid-3" style="margin-bottom:2rem;">
+      <div class="card animated-entry" style="animation-delay:0.05s">
+        <div class="card-title">Notes</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:1rem;">Comprehensive notes aligned to CAPE objectives 8.1–8.6 and 9.1. Covers principles, types, applications, and terminology.</p>
+        <button class="btn btn-primary" onclick="switchTab('notes')">Open Notes →</button>
+      </div>
+      <div class="card animated-entry" style="animation-delay:0.1s">
+        <div class="card-title">Simulator</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:1rem;">Run interactive simulations of TLC, Paper, Column, and Gas-Liquid Chromatography with real-world substance data.</p>
+        <button class="btn btn-primary" onclick="switchTab('simulator')">Launch Simulator →</button>
+      </div>
+      <div class="card animated-entry" style="animation-delay:0.15s">
+        <div class="card-title">Quiz</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:1rem;">Test your knowledge with 25 exam-style questions covering all CAPE chromatography objectives.</p>
+        <button class="btn btn-primary" onclick="switchTab('quiz')">Start Quiz →</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">CAPE Objectives Covered</div>
+        <div class="objectives-grid">
+          <div class="obj-item">8.1 — Theoretical principles of chromatographic methods (adsorption &amp; partition)</div>
+          <div class="obj-item">8.2 — Terms: retention factor (R<sub>f</sub>), retention time (t<sub>R</sub>), visualising agent, solvent front</div>
+          <div class="obj-item">8.3 — Basic steps in separating and quantifying mixture components</div>
+          <div class="obj-item">8.4 — Examples of stationary phases (cellulose, silica gel, alumina)</div>
+          <div class="obj-item">8.5 — Separating amino acids, plant pigments, and food colourings</div>
+          <div class="obj-item">8.6 — Wide applications: pesticide analysis, forensic testing, natural product purification</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">What is Chromatography?</div>
+        <p style="font-family:var(--font-serif);font-size:1.05rem;color:var(--text-secondary);font-style:italic;line-height:1.7;margin-bottom:0.75rem;">
+          "Chromatography is the non-destructive separation of chemical substances by selective sorption — the differential distribution of components between a stationary phase and a mobile phase."
+        </p>
+        <div class="callout info" style="margin:0.5rem 0 0">
+          <div class="callout-title">🔬 Core Principle</div>
+          Components move at different rates because they have different affinities for the stationary and mobile phases. The greater the affinity for the stationary phase, the slower the movement.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout didyouknow" style="margin-top:1.5rem">
+      <div class="callout-title">💡 Did You Know?</div>
+      The word <em>chromatography</em> literally means "colour writing" — derived from two Greek words. In its earliest days, the technique was only used to separate coloured plant pigments. Today it is one of the most powerful analytical tools in science, used from pharmaceutical testing to space exploration.
+    </div>
+
+    <!-- Overview cards -->
+    <h2 class="section-heading" style="margin-top:2rem">The Four Types We Explore</h2>
+    <div class="grid-2" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent)">🧪 TLC — Thin Layer</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary)">Silica or alumina on a glass/plastic plate. Very fast, inexpensive. Used for amino acids, dyes, drugs. Components identified by R<sub>f</sub> value after visualisation.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent3)">📄 Paper Chromatography</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary)">Cellulose paper as stationary phase. Classic technique for separating plant pigments, amino acids, and food dyes.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2)">🏛 Column Chromatography</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary)">Silica or alumina packed into a vertical column. Preparative scale. Components elute in fractions for collection.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent4)">📈 Gas-Liquid (GLC)</div>
+        <p style="font-size:0.875rem; color:var(--text-secondary)">Carrier gas through a stationary liquid phase. Identifies volatile compounds by retention time. Coupled to MS for confirmation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: NOTES
+     ============================================================ -->
+<div id="tab-notes" class="tab-panel">
+  <div class="main-content">
+    <h2 class="section-heading">Comprehensive Notes</h2>
+    <p class="section-sub">Expand each section to read detailed notes aligned with CAPE Unit 2, Module 2 objectives.</p>
+
+    <!-- 8.1 -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">8.1</span>Theoretical Principles of Chromatography</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <p><span class="badge badge-objective">CAPE Objective</span> Explain the theoretical principles upon which chromatographic methods are based, in terms of adsorption and partition between the mobile and stationary phases.</p>
+        <div class="callout info">
+          <div class="callout-title">🔬 Core Principle</div>
+          Chromatography separates substances using <strong>two competing forces</strong>: the tendency of a substance to remain on the stationary phase versus its tendency to dissolve in and move with the mobile phase. Components that interact more strongly with the stationary phase move slowly; those with greater affinity for the mobile phase travel faster.
+        </div>
+        <h4>The Two Phases</h4>
+        <p><strong>Mobile Phase:</strong> The carrier — a liquid or gas that moves through or over the stationary phase, carrying the analyte with it. Its polarity is critical in determining separation quality.</p>
+        <p><strong>Stationary Phase:</strong> The fixed material — a solid or a liquid supported on a solid. The analyte components interact with it to varying extents, causing differential migration.</p>
+        <h4>Two Types of Separation Mechanism</h4>
+        <div class="callout concept">
+          <div class="callout-title">⚗ Adsorption Chromatography</div>
+          The stationary phase is a <strong>solid</strong> (e.g., silica gel, alumina). Components form bonds of varying strength with the solid surface. Molecules more strongly adsorbed move slowly; those weakly adsorbed move faster with the solvent. The equilibrium is: <br><br>
+          <code>Substance<sub>(adsorbed)</sub> ⇌ Substance<sub>(dissolved in mobile phase)</sub></code><br><br>
+          Used in TLC and column chromatography with solid stationary phases.
+        </div>
+        <div class="callout concept">
+          <div class="callout-title">💧 Partition Chromatography</div>
+          The stationary phase is a <strong>liquid</strong> trapped on a solid support (e.g., water adsorbed on cellulose fibres). Components distribute between the two liquid phases according to their <em>partition coefficient</em> — their relative solubility in each phase. Components more soluble in the stationary liquid are retarded; those more soluble in the mobile phase travel faster. Used in paper chromatography and GLC.
+        </div>
+        <h4>Types of Chromatography by Phase</h4>
+        <p>The CAPE syllabus specifically requires reference to: <strong>paper</strong>, <strong>column</strong>, <strong>thin layer</strong>, and <strong>gas-liquid</strong> chromatography.</p>
+        <div class="callout didyouknow">
+          <div class="callout-title">💡 Historical Note</div>
+          Chromatography was invented in 1900 by the Russian botanist <strong>Mikhail Tsvet</strong>, who used calcium carbonate columns to separate leaf pigments. He named it "chromatography" after the coloured bands he observed.
+        </div>
+      </div>
+    </div>
+
+    <!-- 8.2 -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">8.2</span>Key Terms: R<sub>f</sub>, t<sub>R</sub>, Visualising Agent, Solvent Front</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <p><span class="badge badge-objective">CAPE Objective</span> Explain the terms: retention factor (R<sub>f</sub>) and retention time (t<sub>R</sub>); visualising agent; solvent front.</p>
+        <h4>Retention Factor (R<sub>f</sub>)</h4>
+        <div class="callout formula">
+          <div class="callout-title">📐 Formula</div>
+          <div class="formula-display">
+            R<sub>f</sub> = <span class="fraction"><span class="numer">Distance moved by substance from baseline</span><span class="denom">Distance moved by solvent front from baseline</span></span>
+          </div>
+          <p style="margin-top:0.5rem;color:var(--text-secondary);font-family:var(--font-body)">R<sub>f</sub> values range from 0 to 1. They are <strong>dimensionless</strong> and are characteristic for a given substance under the same conditions (solvent, stationary phase, temperature).</p>
+        </div>
+        <p><strong>Interpreting R<sub>f</sub>:</strong></p>
+        <ul>
+          <li>High R<sub>f</sub> (closer to 1.0): substance is <strong>less polar</strong>, travels far — greater affinity for the mobile phase</li>
+          <li>Low R<sub>f</sub> (closer to 0): substance is <strong>more polar</strong>, stays near origin — stronger interaction with the stationary phase</li>
+        </ul>
+        <div class="callout info">
+          <div class="callout-title">📌 Important Note on R<sub>f</sub> Values</div>
+          R<sub>f</sub> values are only reproducible when temperature, solvent composition, stationary phase, and technique are kept constant. The same substance will have different R<sub>f</sub> values with different solvents! Always report conditions alongside R<sub>f</sub> values.
+        </div>
+        <h4>Retention Time (t<sub>R</sub>) — Used in GLC</h4>
+        <p>In gas-liquid chromatography, the <strong>retention time</strong> is the time elapsed from injection of the sample to the peak maximum of a component in the detector output. It is used instead of R<sub>f</sub> to identify components. Like R<sub>f</sub>, it is characteristic for a substance under fixed conditions (carrier gas, flow rate, column, temperature).</p>
+        <h4>Solvent Front</h4>
+        <p>The <strong>solvent front</strong> is the farthest point reached by the mobile phase (solvent) on the chromatogram. It defines the maximum possible distance of travel. In TLC and paper chromatography, the solvent front must be marked immediately when the run ends, as it evaporates quickly.</p>
+        <h4>Visualising Agent (Locating Agent)</h4>
+        <p>Many compounds are <strong>colourless</strong> and cannot be seen on a chromatogram. A <em>visualising agent</em> is used to reveal their positions. Common methods:</p>
+        <ul>
+          <li><strong>Ninhydrin spray:</strong> Reacts with amino acids to give purple/brown spots</li>
+          <li><strong>Iodine chamber:</strong> Iodine vapour stains many organic compounds brown/yellow (CAPE practical: <em>iodine chamber</em> specifically mentioned)</li>
+          <li><strong>UV lamp:</strong> Fluorescent TLC plates glow under UV; compounds absorbing UV appear as dark spots</li>
+          <li><strong>Potassium permanganate:</strong> For reducing substances</li>
+          <li><strong>Fluorescamine:</strong> For amines</li>
+        </ul>
+        <div class="callout experiment">
+          <div class="callout-title">🧪 CAPE Practical Suggestion</div>
+          Use TLC to investigate mixtures and pure compounds (plant extracts, dyes, inks). Visualisation may be done using an iodine chamber. Calculate R<sub>f</sub> values. Suitable mixtures: amino acids, plant pigments, food colouring.
+        </div>
+      </div>
+    </div>
+
+    <!-- 8.3 -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">8.3</span>Separating and Quantifying Mixture Components</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <p><span class="badge badge-objective">CAPE Objective</span> Describe the basic steps involved in separating and quantifying the components of a mixture. Use of R<sub>f</sub> values and retention times in the quantitation of substances is required.</p>
+        <h4>TLC / Paper Chromatography Procedure</h4>
+        <ol style="padding-left:1.5rem; margin-bottom:1rem; color:var(--text-secondary)">
+          <li style="margin-bottom:8px">Draw a <strong>pencil</strong> baseline 1–2 cm from the bottom of the plate/paper (never ink — ink contains dyes that will be separated themselves!)</li>
+          <li style="margin-bottom:8px">Apply small spots of the sample and known reference compounds on the baseline using a capillary tube. Keep spots small (≈1 mm diameter).</li>
+          <li style="margin-bottom:8px">Place the plate/paper in a covered chamber with the appropriate solvent at a depth below the baseline.</li>
+          <li style="margin-bottom:8px">Allow the solvent to rise by <strong>capillary action</strong>. Cover the chamber to prevent solvent evaporation (this also ensures vapour saturation).</li>
+          <li style="margin-bottom:8px">When the solvent front nears the top, remove the plate and <strong>immediately mark</strong> the solvent front in pencil.</li>
+          <li style="margin-bottom:8px">Allow to dry. Visualise spots if colourless (UV, iodine, ninhydrin).</li>
+          <li style="margin-bottom:8px">Measure distances from baseline to centre of each spot and to the solvent front. Calculate R<sub>f</sub> values.</li>
+          <li style="margin-bottom:8px">Identify components by comparing R<sub>f</sub> values with known standards run simultaneously.</li>
+        </ol>
+        <div class="callout concept">
+          <div class="callout-title">⚖ Quantification via TLC</div>
+          For precise quantification, spots can be cut from the TLC plate, the compound dissolved out with a solvent, and the resulting solution analysed by UV-Vis spectrophotometry or mass spectrometry. This combines the separation power of TLC with the quantitative precision of spectroscopy.
+        </div>
+        <h4>Column Chromatography Procedure</h4>
+        <ol style="padding-left:1.5rem; margin-bottom:1rem; color:var(--text-secondary)">
+          <li style="margin-bottom:8px">Pack the column with the stationary phase (slurry method ensures no air gaps)</li>
+          <li style="margin-bottom:8px">Add the mixture to the top of the column as a concentrated solution</li>
+          <li style="margin-bottom:8px">Continuously add fresh solvent (eluent) to the top</li>
+          <li style="margin-bottom:8px">Collect fractions (1–100 cm³) at the bottom in test tubes</li>
+          <li style="margin-bottom:8px">Each component elutes as a separate band at a different time</li>
+          <li style="margin-bottom:8px">Analyse fractions by UV-Vis, measure absorbance to determine amount in each fraction</li>
+        </ol>
+        <h4>GLC Quantification</h4>
+        <p>In GLC, each component produces a peak. The <strong>area under each peak</strong> is proportional to the amount of that component.</p>
+        <div class="callout formula">
+          <div class="callout-title">📐 GLC Composition Formula</div>
+          <div class="formula-display">% of component A = (Peak area of A / Sum of all peak areas) × 100%</div>
+          <p style="margin-top:0.5rem;color:var(--text-secondary);font-family:var(--font-body)">Since peaks are approximately triangular: Peak area ≈ ½ × base × height</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8.4 -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">8.4</span>Stationary Phases: Cellulose, Silica Gel, Alumina</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <p><span class="badge badge-objective">CAPE Objective</span> Name examples of commonly used stationary phases, including cellulose, silica gel, and alumina.</p>
+        <div class="grid-3" style="margin-top:0.5rem">
+          <div class="callout info">
+            <div class="callout-title">🌿 Cellulose (Paper)</div>
+            <p style="color:var(--text-secondary);font-size:0.85rem">The cellulose fibres in chromatography paper trap water which acts as the stationary phase. Very polar. Used in paper chromatography. Best for hydrophilic compounds: amino acids, sugars, plant pigments.</p>
+          </div>
+          <div class="callout concept">
+            <div class="callout-title">🪨 Silica Gel (SiO₂)</div>
+            <p style="color:var(--text-secondary);font-size:0.85rem">Finely powdered silicon dioxide. Polar, slightly acidic. Most common stationary phase for TLC and column chromatography. Excellent for organic compounds. Large surface area (200–500 m²/g).</p>
+          </div>
+          <div class="callout experiment">
+            <div class="callout-title">🧱 Alumina (Al₂O₃)</div>
+            <p style="color:var(--text-secondary);font-size:0.85rem">Aluminium oxide. Polar, slightly basic. Good for acid-sensitive compounds. Also used as a thin film or narrow column. More reactive than silica — requires care with unstable compounds.</p>
+          </div>
+        </div>
+        <div class="callout summary">
+          <div class="callout-title">📊 Comparison Summary</div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse;margin-top:0.5rem">
+            <tr>
+              <th style="padding:6px 8px;border:1px solid var(--border);color:var(--text-primary);background:var(--bg-secondary)">Phase</th>
+              <th style="padding:6px 8px;border:1px solid var(--border);color:var(--text-primary);background:var(--bg-secondary)">Type</th>
+              <th style="padding:6px 8px;border:1px solid var(--border);color:var(--text-primary);background:var(--bg-secondary)">Polarity</th>
+              <th style="padding:6px 8px;border:1px solid var(--border);color:var(--text-primary);background:var(--bg-secondary)">Best For</th>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Cellulose</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Partition</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">High (polar)</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Amino acids, sugars, pigments</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Silica Gel</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Adsorption</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Medium-High</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Most organic compounds</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Alumina</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Adsorption</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Medium-High</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Basic/neutral compounds</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Hydrocarbon oil</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Partition (GLC)</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Low</td>
+              <td style="padding:6px 8px;border:1px solid var(--border);color:var(--text-secondary)">Volatile organic compounds</td>
+            </tr>
+          </table>
+        </div>
+        <div class="callout didyouknow">
+          <div class="callout-title">💡 Why Fine Powder?</div>
+          Adsorbents are used as fine powder to present a <strong>very large surface area</strong> to the component molecules. This maximises adsorption and allows the equilibrium to be established rapidly as the mobile phase flows through. Silica gel has a surface area of up to 500 m² per gram!
+        </div>
+      </div>
+    </div>
+
+    <!-- 8.5 -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">8.5</span>Separating Amino Acids, Plant Pigments &amp; Food Colouring</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <p><span class="badge badge-objective">CAPE Objective</span> Separate the components of mixtures. Suitable mixtures include amino acids, plant pigments, food colouring.</p>
+        <p><span class="badge badge-practical">Practical</span> Perform simple experiments using paper and column chromatographic techniques.</p>
+        <h4>Amino Acids</h4>
+        <p>Amino acids are polar molecules. On silica TLC with n-butanol:acetic acid:water (3:1:1) solvent system, their R<sub>f</sub> values depend on their polarity and side chain. Visualised with <strong>ninhydrin spray</strong> (gives purple to brown colours). Key values:</p>
+        <div class="callout formula">
+          <div class="callout-title">📊 Amino Acid R<sub>f</sub> Values (silica, n-BuOH:AcOH:H₂O 3:1:1)</div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse;margin-top:0.5rem">
+            <tr><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">Amino Acid</th><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">R<sub>f</sub></th><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">Polarity</th></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Lysine</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.14</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Very polar (charged)</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Glycine</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.20</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Polar</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Aspartic acid</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.25</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Very polar</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Alanine</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.40</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Moderately polar</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Valine</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.53</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Slightly nonpolar</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Phenylalanine</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.68</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Nonpolar (aromatic)</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Leucine</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.73</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Nonpolar (aliphatic)</td></tr>
+          </table>
+        </div>
+        <h4>Plant Pigments</h4>
+        <p>Spinach leaves contain multiple pigments separable by paper or TLC using <strong>petroleum ether:acetone</strong> as solvent. R<sub>f</sub> values reflect polarity (carotene least polar, xanthophylls most polar):</p>
+        <div class="callout formula">
+          <div class="callout-title">🍃 Plant Pigment R<sub>f</sub> Values (petroleum ether:acetone 92:8)</div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse;margin-top:0.5rem">
+            <tr><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">Pigment</th><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">Colour</th><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">R<sub>f</sub></th></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">β-Carotene</td><td style="padding:5px 8px;border:1px solid var(--border);"><span style="color:#F4A420">■</span> Orange</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.98</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Pheophytin</td><td style="padding:5px 8px;border:1px solid var(--border);"><span style="color:#8B8B4E">■</span> Olive/Grey</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.81</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Chlorophyll a</td><td style="padding:5px 8px;border:1px solid var(--border);"><span style="color:#2E8B57">■</span> Blue-green</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.59</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Chlorophyll b</td><td style="padding:5px 8px;border:1px solid var(--border);"><span style="color:#6B8E23">■</span> Yellow-green</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.42</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Xanthophyll 1</td><td style="padding:5px 8px;border:1px solid var(--border);"><span style="color:#FFD700">■</span> Yellow</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.28</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Xanthophyll 2</td><td style="padding:5px 8px;border:1px solid var(--border);"><span style="color:#DAA520">■</span> Yellow</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">0.15</td></tr>
+          </table>
+        </div>
+        <div class="callout experiment">
+          <div class="callout-title">🧪 Experiment — Plant Pigments by Paper Chromatography</div>
+          <ol style="padding-left:1.2rem;margin-top:0.5rem;color:var(--text-secondary);font-size:0.875rem">
+            <li>Grind spinach leaves in acetone to extract pigments</li>
+            <li>Apply concentrated spot to chromatography paper</li>
+            <li>Use petroleum ether:acetone (92:8) as mobile phase</li>
+            <li>Run in covered chamber for 20–30 minutes</li>
+            <li>Mark solvent front, measure bands and calculate R<sub>f</sub></li>
+            <li>Identify bands by colour and R<sub>f</sub> value comparison</li>
+          </ol>
+        </div>
+        <h4>Food Colouring (Dyes)</h4>
+        <p>Food dyes in sweets and drinks can be separated on cellulose or silica TLC. The dyes are naturally coloured, so no visualising agent is needed. This makes food dye TLC an ideal beginner experiment.</p>
+        <div class="callout didyouknow">
+          <div class="callout-title">💡 Two-Dimensional Chromatography</div>
+          When two compounds have similar R<sub>f</sub> values and cannot be separated in one run, <strong>2D chromatography</strong> is used. After the first run, the paper is rotated 90° and a second run is performed using a different solvent. This greatly increases resolution.
+        </div>
+      </div>
+    </div>
+
+    <!-- 8.6 -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">8.6</span>Applications of Chromatographic Separation</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <p><span class="badge badge-objective">CAPE Objective</span> Cite the wide applications of chromatographic methods of separation. Refer to pesticide analysis, forensic testing, purification of natural products.</p>
+        <div class="grid-3" style="margin-top:0.75rem">
+          <div class="callout info">
+            <div class="callout-title">🌾 Pesticide Analysis</div>
+            <p style="font-size:0.85rem;color:var(--text-secondary)">GLC and HPLC are used to detect and quantify pesticide residues in food, water, and soil at parts-per-billion concentrations. Retention times are matched against known standards. GLC-MS provides definitive identification.</p>
+          </div>
+          <div class="callout concept">
+            <div class="callout-title">🔍 Forensic Testing</div>
+            <p style="font-size:0.85rem;color:var(--text-secondary)">Drug identification in blood/urine samples; ink analysis (forgery detection via TLC of pen inks); explosives residue analysis; arson investigation (GLC of accelerants). GLC retention times matched against drug libraries.</p>
+          </div>
+          <div class="callout experiment">
+            <div class="callout-title">🌿 Purification of Natural Products</div>
+            <p style="font-size:0.85rem;color:var(--text-secondary)">Column chromatography at large scale purifies plant-based drugs (e.g., limonene), essential oils, and pharmaceutical compounds. Each fraction collected is analysed separately and pure fractions combined.</p>
+          </div>
+        </div>
+        <div class="callout summary">
+          <div class="callout-title">📋 Other Important Applications</div>
+          <ul style="color:var(--text-secondary);font-size:0.875rem;margin-top:0.5rem">
+            <li><strong>Clinical chemistry:</strong> Amino acid profiling in urine for metabolic disease diagnosis</li>
+            <li><strong>Food science:</strong> Separating and identifying flavour compounds, antioxidants, vitamins</li>
+            <li><strong>Pharmaceutical:</strong> Quality control of drug purity; identifying degradation products</li>
+            <li><strong>Environmental monitoring:</strong> Detecting pollutants in air and water</li>
+            <li><strong>Sports doping:</strong> Testing blood/urine of athletes for performance-enhancing drugs</li>
+            <li><strong>Petroleum industry:</strong> Analysing fuel compositions by GLC</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLC DEDICATED -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">GLC</span>Gas-Liquid Chromatography — Detailed</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <h4>How GLC Works</h4>
+        <p>Gas-Liquid Chromatography (GLC) is a form of <strong>partition chromatography</strong>. The stationary phase is a high-boiling point liquid (e.g., long-chain hydrocarbon oil) supported on a porous inert solid such as silica or alumina, packed into a long spiral tube. The mobile phase is an unreactive <strong>carrier gas</strong> (nitrogen, helium, or argon).</p>
+        <div class="callout info">
+          <div class="callout-title">🔧 The GLC Apparatus</div>
+          <ul style="color:var(--text-secondary);font-size:0.875rem;margin-top:0.5rem">
+            <li><strong>Sample injection port:</strong> Sample vaporised and injected into carrier gas stream</li>
+            <li><strong>Spiral column:</strong> Long tube (1–50 m) containing the stationary phase, inside a temperature-controlled oven</li>
+            <li><strong>Variable temperature oven:</strong> Temperature programming allows better separation of complex mixtures</li>
+            <li><strong>Detector:</strong> Usually thermal conductivity detector (TCD) or flame ionisation detector (FID)</li>
+            <li><strong>Recorder/Computer:</strong> Plots the chromatogram — signal vs. time</li>
+          </ul>
+        </div>
+        <h4>Separation Principle</h4>
+        <p>As the vaporised mixture is carried through the column, components that are <strong>more soluble in the stationary oil</strong> travel more slowly; those less soluble in the oil travel faster with the carrier gas. Components exit the column at different times (retention times) and are detected sequentially.</p>
+        <div class="callout formula">
+          <div class="callout-title">📐 GLC Requirements</div>
+          <p style="color:var(--text-secondary);font-size:0.875rem">The substance injected must be able to form a vapour easily — i.e., it must be a gas, liquid, or volatile solid at the operating temperature. This limits GLC to relatively small, volatile organic molecules (molecular mass typically &lt;800 g/mol).</p>
+        </div>
+        <h4>Reading a GLC Chromatogram</h4>
+        <p>A GLC trace shows <strong>signal intensity vs. retention time</strong>. Each peak represents one component. The peak appears at the component's characteristic retention time. Peak area is proportional to concentration.</p>
+        <div class="callout summary">
+          <div class="callout-title">📊 GLC Retention Times — Typical Organic Compounds</div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse;margin-top:0.5rem">
+            <tr><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">Compound</th><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">t<sub>R</sub> (min)</th><th style="padding:5px 8px;border:1px solid var(--border);color:var(--accent3);background:var(--bg-secondary)">Notes</th></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Hex-1-ene</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">3.5</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Low boiling alkene</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Heptane</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">8.5</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Alkane reference</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Pentan-2-one</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">14.0</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Ketone, polar</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Ethanol</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">4.2</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Short-chain alcohol</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Propan-1-ol</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">6.1</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Polar alcohol</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Butan-1-ol</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">9.3</td><td style="padding:5px 8px;border:1px solid var(--border);color:var(--text-secondary)">Polar alcohol</td></tr>
+          </table>
+        </div>
+        <div class="callout didyouknow">
+          <div class="callout-title">💡 GLC + Mass Spectrometry</div>
+          One important limitation of GLC is that similar compounds have similar retention times. This is overcome by coupling GLC with a mass spectrometer (GLC-MS). The MS provides a structural fingerprint that uniquely identifies each component — used heavily in drug testing, environmental analysis, and food authenticity testing.
+        </div>
+      </div>
+    </div>
+
+    <!-- Column Chromatography Dedicated -->
+    <div class="collapsible-group">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="collapsible-title"><span class="collapsible-num">COL</span>Column Chromatography — Detailed</div>
+        <span class="collapsible-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <h4>Principle</h4>
+        <p>Column chromatography is a form of <strong>adsorption chromatography</strong> on a preparative scale. Silica, alumina, or a resin is packed into a vertical glass tube (the column). The mixture is added to the top and a solvent (eluent) is run through continuously. Components separate as distinct bands that travel down the column at different rates.</p>
+        <div class="callout concept">
+          <div class="callout-title">⚗ The Equilibrium</div>
+          <code>Substance<sub>(adsorbed on silica)</sub> ⇌ Substance<sub>(dissolved in solvent)</sub></code><br><br>
+          Materials strongly adsorbed travel slowly (remain adsorbed most of the time). Weakly adsorbed materials spend more time dissolved in the solvent and travel faster.
+        </div>
+        <h4>Key Advantage Over TLC</h4>
+        <p>Column chromatography allows separation of <strong>milligrams to grams</strong> of material, making it preparative (for collecting pure substances), not just analytical. Columns can be up to 3.2 metres wide and 15 metres high for industrial-scale purification.</p>
+        <div class="callout experiment">
+          <div class="callout-title">🧪 Classic Experiment — Spinach Pigments by Column</div>
+          Using a silica column with petroleum ether:acetone gradient, spinach pigments elute in this order: β-carotene (most nonpolar, fastest) → Pheophytin → Chlorophyll a → Chlorophyll b → Xanthophylls (most polar, slowest).
+        </div>
+        <h4>Quantification in Column Chromatography</h4>
+        <p>Each fraction collected can be analysed separately: proteins by ninhydrin + visible spectroscopy at 570 nm; amino acids by ninhydrin colorimetry; chlorophylls by absorbance at 664 nm (Chl a) or 647 nm (Chl b). This allows a <strong>concentration vs. volume profile</strong> to be constructed.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: SIMULATOR
+     ============================================================ -->
+<div id="tab-simulator" class="tab-panel">
+  <div class="main-content">
+    <h2 class="section-heading">Interactive Chromatography Simulator</h2>
+    <p class="section-sub">Simulate real chromatography experiments with authentic substance data.</p>
+
+    <!-- Sim Type Selector -->
+    <div class="sim-tabs" id="simTypeTabs">
+      <button class="sim-tab-btn active" onclick="switchSimType('tlc', this)">TLC</button>
+      <button class="sim-tab-btn" onclick="switchSimType('paper', this)">Paper</button>
+      <button class="sim-tab-btn" onclick="switchSimType('column', this)">Column</button>
+      <button class="sim-tab-btn" onclick="switchSimType('glc', this)">Gas-Liquid (GLC)</button>
+    </div>
+
+    <!-- TLC SIMULATOR -->
+    <div id="sim-tlc" class="sim-screen active">
+      <div class="sim-panel">
+        <div class="card-title">TLC Controls</div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Sample Set</label>
+          <select class="ctrl-select" id="tlcSampleSet" onchange="tlcUpdateSubstances()">
+            <option value="amino">Amino Acids (n-BuOH:AcOH:H₂O)</option>
+            <option value="pigment">Plant Pigments (Pet. ether:Acetone)</option>
+            <option value="dye">Food Dyes (Ethyl acetate:H₂O)</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Select Substances (max 6)</label>
+          <div id="tlcSubstanceChecks"></div>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Stationary Phase</label>
+          <select class="ctrl-select" id="tlcStatPhase">
+            <option>Silica Gel (SiO₂)</option>
+            <option>Alumina (Al₂O₃)</option>
+            <option>Cellulose</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Visualisation</label>
+          <select class="ctrl-select" id="tlcVis">
+            <option>UV Light (coloured naturally)</option>
+            <option>Ninhydrin Spray</option>
+            <option>Iodine Chamber</option>
+          </select>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="runTLC()">▶ Run TLC</button>
+          <button class="btn btn-secondary" onclick="resetTLC()">↺ Reset</button>
+        </div>
+        <div style="margin-top:12px">
+          <div class="status-indicator">
+            <div class="status-dot idle" id="tlcStatusDot"></div>
+            <span id="tlcStatusText">Ready</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="tlcProgress"></div></div>
+        </div>
+      </div>
+      <div class="sim-canvas-area" style="flex:1">
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+          <div class="canvas-wrapper" style="flex:1;min-width:220px;">
+            <canvas id="tlcCanvas" width="280" height="420"></canvas>
+            <div class="canvas-label">TLC Plate</div>
+          </div>
+          <div style="flex:1;min-width:240px;">
+            <div class="card-title">R<sub>f</sub> Data — Bidirectional</div>
+            <div class="rf-table-container">
+              <table class="rf-table" id="tlcRfTable">
+                <thead><tr><th>#</th><th>Substance</th><th>Colour</th><th>R<sub>f</sub></th><th>dist (cm)</th></tr></thead>
+                <tbody id="tlcRfBody"></tbody>
+              </table>
+            </div>
+            <div class="rf-detail-panel" id="tlcDetailPanel">
+              <div class="rf-detail-row"><span class="rf-detail-key">Substance:</span><span class="rf-detail-val" id="tdName">—</span></div>
+              <div class="rf-detail-row"><span class="rf-detail-key">R<sub>f</sub> value:</span><span class="rf-detail-val" id="tdRf">—</span></div>
+              <div class="rf-detail-row"><span class="rf-detail-key">Distance (spot):</span><span class="rf-detail-val" id="tdDist">—</span></div>
+              <div class="rf-detail-row"><span class="rf-detail-key">Solvent front:</span><span class="rf-detail-val" id="tdFront">10.0 cm</span></div>
+              <div class="rf-detail-row"><span class="rf-detail-key">Polarity:</span><span class="rf-detail-val" id="tdPol">—</span></div>
+              <div class="rf-detail-row"><span class="rf-detail-key">Calc: R<sub>f</sub> =</span><span class="rf-detail-val" id="tdCalc">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAPER CHROMATOGRAPHY SIMULATOR -->
+    <div id="sim-paper" class="sim-screen">
+      <div class="sim-panel">
+        <div class="card-title">Paper Chrom. Controls</div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Sample</label>
+          <select class="ctrl-select" id="paperSample" onchange="paperUpdateSubstances()">
+            <option value="pigment">Plant Pigments (Spinach)</option>
+            <option value="amino">Amino Acids</option>
+            <option value="dye">Food Dyes</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Substances</label>
+          <div id="paperSubChecks"></div>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Paper Type</label>
+          <select class="ctrl-select" id="paperType">
+            <option>Whatman No.1 Filter Paper</option>
+            <option>Chromatography Grade Cellulose</option>
+          </select>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="runPaper()">▶ Run</button>
+          <button class="btn btn-secondary" onclick="resetPaper()">↺ Reset</button>
+        </div>
+        <div style="margin-top:12px">
+          <div class="status-indicator">
+            <div class="status-dot idle" id="paperStatusDot"></div>
+            <span id="paperStatusText">Ready</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="paperProgress"></div></div>
+        </div>
+        <div class="rf-detail-panel visible" id="paperDetailPanel" style="margin-top:1rem">
+          <div class="rf-detail-row"><span class="rf-detail-key">Hovered:</span><span class="rf-detail-val" id="pdName">—</span></div>
+          <div class="rf-detail-row"><span class="rf-detail-key">R<sub>f</sub>:</span><span class="rf-detail-val" id="pdRf">—</span></div>
+          <div class="rf-detail-row"><span class="rf-detail-key">Band colour:</span><span class="rf-detail-val" id="pdCol">—</span></div>
+        </div>
+      </div>
+      <div class="sim-canvas-area" style="flex:1">
+        <canvas id="paperCanvas" width="340" height="520"></canvas>
+        <div class="canvas-label">Paper Chromatography Strip</div>
+        <div style="margin-top:1rem">
+          <div class="card-title" style="margin-bottom:0.5rem">R<sub>f</sub> Results</div>
+          <div class="rf-table-container">
+            <table class="rf-table" id="paperRfTable">
+              <thead><tr><th>Pigment / Compound</th><th>Colour</th><th>R<sub>f</sub></th></tr></thead>
+              <tbody id="paperRfBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMN SIMULATOR -->
+    <div id="sim-column" class="sim-screen">
+      <div class="sim-panel">
+        <div class="card-title">Column Controls</div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Sample</label>
+          <select class="ctrl-select" id="colSample" onchange="columnUpdateSubstances()">
+            <option value="pigment">Spinach Pigments</option>
+            <option value="amino">Amino Acids</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Components</label>
+          <div id="colSubChecks"></div>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Eluent Flow Rate</label>
+          <select class="ctrl-select" id="colFlowRate">
+            <option value="1">Slow (1 mL/min)</option>
+            <option value="2" selected>Medium (2 mL/min)</option>
+            <option value="3">Fast (3 mL/min)</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Column Packing</label>
+          <select class="ctrl-select" id="colPacking">
+            <option>Silica Gel (230-400 mesh)</option>
+            <option>Alumina (150 mesh)</option>
+          </select>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="runColumn()">▶ Elute</button>
+          <button class="btn btn-secondary" onclick="resetColumn()">↺ Reset</button>
+        </div>
+        <div style="margin-top:12px">
+          <div class="status-indicator">
+            <div class="status-dot idle" id="colStatusDot"></div>
+            <span id="colStatusText">Ready</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="colProgress"></div></div>
+        </div>
+        <div class="rf-table-container" style="margin-top:1rem">
+          <table class="rf-table" id="colElutionTable">
+            <thead><tr><th>Component</th><th>Elution Order</th><th>Vol (cm³)</th></tr></thead>
+            <tbody id="colElutionBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sim-canvas-area" style="flex:1">
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <div>
+            <canvas id="columnCanvas" width="160" height="480"></canvas>
+            <div class="canvas-label">Column</div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <canvas id="columnElutionCanvas" width="320" height="280"></canvas>
+            <div class="canvas-label">Elution Profile (UV absorbance)</div>
+            <div id="colFractionInfo" style="margin-top:1rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLC SIMULATOR -->
+    <div id="sim-glc" class="sim-screen">
+      <div class="sim-panel">
+        <div class="card-title">GLC Controls</div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Sample Mixture</label>
+          <select class="ctrl-select" id="glcSample" onchange="glcUpdateSubstances()">
+            <option value="organic">Organic Volatiles</option>
+            <option value="alcohols">Alcohol Series</option>
+            <option value="fuels">Fuel Components</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Components</label>
+          <div id="glcSubChecks"></div>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Carrier Gas</label>
+          <select class="ctrl-select" id="glcCarrier">
+            <option>Nitrogen (N₂)</option>
+            <option>Helium (He)</option>
+            <option>Argon (Ar)</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Column Temperature (°C)</label>
+          <input type="range" min="50" max="300" value="150" id="glcTemp" style="width:100%;accent-color:var(--accent)">
+          <div style="text-align:right;font-family:var(--font-mono);font-size:0.75rem;color:var(--accent)" id="glcTempVal">150°C</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="runGLC()">▶ Inject &amp; Run</button>
+          <button class="btn btn-secondary" onclick="resetGLC()">↺ Reset</button>
+        </div>
+        <div style="margin-top:12px">
+          <div class="status-indicator">
+            <div class="status-dot idle" id="glcStatusDot"></div>
+            <span id="glcStatusText">Ready — awaiting injection</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="glcProgress"></div></div>
+        </div>
+        <div class="glc-readout">
+          <div class="glc-readout-item"><div class="glc-label">Current t</div><div class="glc-value" id="glcTimeDisplay">0.0 min</div></div>
+          <div class="glc-readout-item"><div class="glc-label">Peaks</div><div class="glc-value" id="glcPeakCount">0</div></div>
+          <div class="glc-readout-item"><div class="glc-label">Signal</div><div class="glc-value" id="glcSignalDisplay">0.00</div></div>
+          <div class="glc-readout-item"><div class="glc-label">Last Peak</div><div class="glc-value" id="glcLastPeak">—</div></div>
+        </div>
+      </div>
+      <div class="sim-canvas-area" style="flex:1">
+        <canvas id="glcCanvas" width="620" height="320" style="width:100%;max-width:620px"></canvas>
+        <div class="canvas-label">GLC Chromatogram — Signal vs. Retention Time</div>
+        <div class="rf-table-container" style="margin-top:1rem">
+          <table class="rf-table" id="glcResultTable">
+            <thead><tr><th>Component</th><th>t<sub>R</sub> (min)</th><th>Peak Area</th><th>% Composition</th></tr></thead>
+            <tbody id="glcResultBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: CALCULATIONS
+     ============================================================ -->
+<div id="tab-calculator" class="tab-panel">
+  <div class="main-content">
+    <h2 class="section-heading">Chromatography Calculations</h2>
+    <p class="section-sub">Interactive calculators with step-by-step solutions.</p>
+
+    <div class="grid-2">
+      <!-- Rf Calculator -->
+      <div class="card">
+        <div class="card-title">R<sub>f</sub> Value Calculator</div>
+        <div class="callout formula" style="margin-bottom:1rem">
+          <div class="callout-title">Formula</div>
+          <div class="formula-display">R<sub>f</sub> = d<sub>substance</sub> ÷ d<sub>solvent front</sub></div>
+        </div>
+        <div class="calc-box">
+          <div class="calc-row">
+            <div class="calc-field">
+              <label>Distance moved by substance (cm)</label>
+              <input type="number" id="rfDist" placeholder="e.g. 4.2" step="0.1">
+            </div>
+            <div class="calc-field">
+              <label>Distance moved by solvent front (cm)</label>
+              <input type="number" id="rfFront" placeholder="e.g. 8.5" step="0.1">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="calcRf()">Calculate R<sub>f</sub></button>
+          <div class="calc-result" id="rfResult">
+            <div class="result-val" id="rfResultVal"></div>
+            <div class="result-step" id="rfResultStep"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retention Time Calc -->
+      <div class="card">
+        <div class="card-title">Retention Time Analysis (GLC)</div>
+        <div class="callout formula" style="margin-bottom:1rem">
+          <div class="callout-title">Formula</div>
+          <div class="formula-display">% A = (Peak area<sub>A</sub> ÷ Σ all peak areas) × 100%</div>
+        </div>
+        <div class="calc-box">
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Enter peak dimensions (triangular approximation: area = ½ × base × height)</p>
+          <div id="peakRows">
+            <div class="calc-row peak-row" data-idx="0">
+              <div class="calc-field"><label>Peak 1 — Base (min)</label><input type="number" class="peak-base" placeholder="e.g. 0.8" step="0.1"></div>
+              <div class="calc-field"><label>Height (cm)</label><input type="number" class="peak-height" placeholder="e.g. 5.2" step="0.1"></div>
+              <div class="calc-field"><label>Name</label><input type="text" class="peak-name" placeholder="e.g. Hex-1-ene"></div>
+            </div>
+            <div class="calc-row peak-row" data-idx="1">
+              <div class="calc-field"><label>Peak 2 — Base (min)</label><input type="number" class="peak-base" placeholder="e.g. 1.2" step="0.1"></div>
+              <div class="calc-field"><label>Height (cm)</label><input type="number" class="peak-height" placeholder="e.g. 3.8" step="0.1"></div>
+              <div class="calc-field"><label>Name</label><input type="text" class="peak-name" placeholder="e.g. Heptane"></div>
+            </div>
+            <div class="calc-row peak-row" data-idx="2">
+              <div class="calc-field"><label>Peak 3 — Base (min)</label><input type="number" class="peak-base" placeholder="" step="0.1"></div>
+              <div class="calc-field"><label>Height (cm)</label><input type="number" class="peak-height" placeholder="" step="0.1"></div>
+              <div class="calc-field"><label>Name</label><input type="text" class="peak-name" placeholder=""></div>
+            </div>
+          </div>
+          <div class="btn-group" style="margin-top:0.75rem">
+            <button class="btn btn-primary" onclick="calcComposition()">Calculate % Composition</button>
+            <button class="btn btn-secondary" onclick="addPeakRow()">+ Add Peak</button>
+          </div>
+          <div class="calc-result" id="compResult">
+            <div class="result-step" id="compResultStep"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unknown identification -->
+      <div class="card">
+        <div class="card-title">Unknown Identification Tool</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem">Enter an experimental R<sub>f</sub> value to identify the most likely substance from our library.</p>
+        <div class="calc-box">
+          <div class="calc-row">
+            <div class="calc-field">
+              <label>Experimental R<sub>f</sub> value</label>
+              <input type="number" id="unknownRf" placeholder="e.g. 0.42" step="0.01" min="0" max="1">
+            </div>
+            <div class="calc-field">
+              <label>Sample Type</label>
+              <select class="ctrl-select" id="unknownType">
+                <option value="all">All types</option>
+                <option value="amino">Amino Acids</option>
+                <option value="pigment">Plant Pigments</option>
+                <option value="dye">Food Dyes</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field" style="margin-bottom:0.75rem">
+            <label>Tolerance (±)</label>
+            <input type="number" id="unknownTol" value="0.05" step="0.01" min="0.01" max="0.2">
+          </div>
+          <button class="btn btn-primary" onclick="identifyUnknown()">Identify Unknown</button>
+          <div class="calc-result" id="unknownResult">
+            <div class="result-step" id="unknownResultStep"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Purity checker -->
+      <div class="card">
+        <div class="card-title">Purity Assessment (TLC)</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem">A pure compound gives exactly ONE spot on TLC. Use this tool to analyse your spots.</p>
+        <div class="calc-box">
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.5rem">Number of spots observed:</p>
+          <div class="calc-row">
+            <div class="calc-field">
+              <label>Number of spots</label>
+              <input type="number" id="spotCount" placeholder="1" min="1" max="10">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="assessPurity()">Assess Purity</button>
+          <div class="calc-result" id="purityResult">
+            <div class="result-step" id="purityResultStep"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: SUBSTANCE LIBRARY
+     ============================================================ -->
+<div id="tab-library" class="tab-panel">
+  <div class="main-content">
+    <h2 class="section-heading">Substance Library</h2>
+    <p class="section-sub">Search and explore chromatographic data for common substances. Click any card to see full details.</p>
+    <div class="substance-search">
+      <input type="text" id="libSearch" placeholder="Search substances... (e.g. 'glycine', 'chlorophyll', 'tartrazine')" oninput="filterLibrary()">
+      <select class="ctrl-select" style="width:180px" id="libFilter" onchange="filterLibrary()">
+        <option value="all">All types</option>
+        <option value="amino">Amino Acids</option>
+        <option value="pigment">Plant Pigments</option>
+        <option value="dye">Food Dyes</option>
+        <option value="organic">Organic (GLC)</option>
+      </select>
+    </div>
+    <div class="substance-grid" id="substanceGrid"></div>
+  </div>
+</div>
+
+<!-- Substance Modal -->
+<div class="modal-overlay" id="substanceModal">
+  <div class="modal-box" style="position:relative">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: QUIZ
+     ============================================================ -->
+<div id="tab-quiz" class="tab-panel">
+  <div class="main-content">
+    <div class="quiz-container">
+      <h2 class="section-heading">Knowledge Assessment</h2>
+      <p class="section-sub">25 exam-style questions covering all CAPE chromatography objectives.</p>
+      <div id="quizArea"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: REFERENCES
+     ============================================================ -->
+<div id="tab-references" class="tab-panel">
+  <div class="main-content">
+    <h2 class="section-heading">References &amp; Further Reading</h2>
+    <p class="section-sub">Curated academic and educational resources for deeper study.</p>
+    <ul class="ref-list">
+      <li><span class="ref-num">1</span><div class="ref-content"><strong>CXC CAPE Chemistry Syllabus</strong> (CXC A11/U2/17). Caribbean Examinations Council. Unit 2, Module 2: Analytical Methods and Separation Techniques. Objectives 8.1–8.6. <a href="https://www.cxc.org" target="_blank">www.cxc.org</a></div></li>
+      <li><span class="ref-num">2</span><div class="ref-content"><strong>Skoog, D.A., Holler, F.J., Crouch, S.R.</strong> (2018). <em>Principles of Instrumental Analysis</em>, 7th ed. Cengage Learning. Chapter 27: Gas Chromatography; Chapter 28: HPLC.</div></li>
+      <li><span class="ref-num">3</span><div class="ref-content"><strong>Chem LibreTexts — Thin Layer Chromatography</strong>. University of California, Davis. Comprehensive TLC theory, solvent selection, and R<sub>f</sub> interpretation. <a href="https://chem.libretexts.org" target="_blank">chem.libretexts.org</a></div></li>
+      <li><span class="ref-num">4</span><div class="ref-content"><strong>Reiss, C.</strong> (1994). <em>Experiments in Plant Physiology</em>. Prentice Hall. Standard R<sub>f</sub> values for spinach pigments separated with petroleum ether-acetone-chloroform (3:1:1).</div></li>
+      <li><span class="ref-num">5</span><div class="ref-content"><strong>Sudhaker et al.</strong> (2017). DLLME Extraction of Amino Acids and TLC Profiling. <em>Applied Clinical Pharmacology and Toxicology</em>. R<sub>f</sub> values for standard amino acids on silica TLC.</div></li>
+      <li><span class="ref-num">6</span><div class="ref-content"><strong>Science in School</strong> — "Colour, Chlorophyll and Chromatography" (2019). European Journal for Science Teachers. Practical guide for TLC of plant pigments with R<sub>f</sub> data. <a href="https://scienceinschool.org" target="_blank">scienceinschool.org</a></div></li>
+      <li><span class="ref-num">7</span><div class="ref-content"><strong>REACH Devices LLC</strong> — TLC of Amino Acids. Experimental data for all 20 amino acids on silica and cellulose TLC with ninhydrin stain, n-butanol:acetic acid:water eluent. <a href="http://reachdevices.com/TLC_aminoacids.html" target="_blank">reachdevices.com</a></div></li>
+      <li><span class="ref-num">8</span><div class="ref-content"><strong>Juniata College, Chemistry Dept.</strong> — TLC of Vegetable Pigments. Experimental R<sub>f</sub> values for carotene, pheophytins, chlorophylls, and xanthophylls from spinach.</div></li>
+      <li><span class="ref-num">9</span><div class="ref-content"><strong>Chang, R.</strong> (2010). <em>Chemistry</em>, 10th ed. McGraw-Hill. Chapter on Analytical Chemistry and Separation Methods.</div></li>
+      <li><span class="ref-num">10</span><div class="ref-content"><strong>Harvey, D.</strong> (2016). <em>Modern Analytical Chemistry</em>. Open-access textbook covering GLC, TLC, and column chromatography theory and applications.</div></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Mobile Nav -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-btn active" onclick="switchTab('home')" data-tab="home"><span class="icon">🏠</span>Home</button>
+  <button class="mobile-nav-btn" onclick="switchTab('notes')" data-tab="notes"><span class="icon">📖</span>Notes</button>
+  <button class="mobile-nav-btn" onclick="switchTab('simulator')" data-tab="simulator"><span class="icon">🔬</span>Sim</button>
+  <button class="mobile-nav-btn" onclick="switchTab('quiz')" data-tab="quiz"><span class="icon">🧩</span>Quiz</button>
+  <button class="mobile-nav-btn" onclick="switchTab('library')" data-tab="library"><span class="icon">🗂</span>Library</button>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA STORE
+// ============================================================
+const SUBSTANCES = {
+  amino: [
+    { id:'lys',  name:'Lysine',       rf:0.14, color:'#9B59B6', polarity:'Very polar (basic)',  ninhydrin:'Purple',   formula:'C₆H₁₄N₂O₂', mw:'146.19', desc:'Basic amino acid. Strongly retained on silica due to two amino groups.' },
+    { id:'gly',  name:'Glycine',      rf:0.20, color:'#8E44AD', polarity:'Polar',               ninhydrin:'Purple',   formula:'C₂H₅NO₂',   mw:'75.03',  desc:'Simplest amino acid, no side chain. Small R_f due to polarity.' },
+    { id:'asp',  name:'Aspartic Acid',rf:0.25, color:'#7D3C98', polarity:'Very polar (acidic)',  ninhydrin:'Purple',   formula:'C₄H₇NO₄',   mw:'133.10', desc:'Acidic amino acid. Strongly adsorbed to silica.' },
+    { id:'ala',  name:'Alanine',      rf:0.40, color:'#6C3483', polarity:'Moderately polar',     ninhydrin:'Purple',   formula:'C₃H₇NO₂',   mw:'89.09',  desc:'Small nonpolar side chain (methyl). Medium R_f.' },
+    { id:'val',  name:'Valine',       rf:0.53, color:'#5B2C6F', polarity:'Slightly nonpolar',    ninhydrin:'Purple',   formula:'C₅H₁₁NO₂',  mw:'117.15', desc:'Branched aliphatic side chain. Higher R_f than alanine.' },
+    { id:'phe',  name:'Phenylalanine',rf:0.68, color:'#A569BD', polarity:'Nonpolar (aromatic)',  ninhydrin:'Purple',   formula:'C₉H₁₁NO₂',  mw:'165.19', desc:'Aromatic ring — most nonpolar common amino acid.' },
+    { id:'leu',  name:'Leucine',      rf:0.73, color:'#884EA0', polarity:'Nonpolar (aliphatic)', ninhydrin:'Purple',   formula:'C₆H₁₃NO₂',  mw:'131.17', desc:'Large aliphatic side chain. High R_f.' },
+  ],
+  pigment: [
+    { id:'car',   name:'β-Carotene',    rf:0.98, color:'#F4A420', polarity:'Nonpolar',     visColor:'Orange',     formula:'C₄₀H₅₆',      mw:'536.87', desc:'Orange carotenoid. No polar groups — highest R_f of all plant pigments.' },
+    { id:'pheo',  name:'Pheophytin',    rf:0.81, color:'#8B8B4E', polarity:'Slightly polar', visColor:'Olive/Grey', formula:'C₅₅H₇₄MgN₄O₅',mw:'871.2',  desc:'Chlorophyll without the central Mg²⁺ ion. Slightly more polar than carotene.' },
+    { id:'chla',  name:'Chlorophyll a', rf:0.59, color:'#2E8B57', polarity:'Moderately polar', visColor:'Blue-green', formula:'C₅₅H₇₂MgN₄O₅',mw:'893.5',  desc:'Primary photosynthetic pigment. Blue-green colour. Absorbs red and blue light.' },
+    { id:'chlb',  name:'Chlorophyll b', rf:0.42, color:'#6B8E23', polarity:'More polar',    visColor:'Yellow-green',formula:'C₅₅H₇₀MgN₄O₆',mw:'907.5',  desc:'Accessory chlorophyll. Has an aldehyde group making it more polar than Chl a.' },
+    { id:'xan1',  name:'Xanthophyll 1 (Lutein)', rf:0.28, color:'#FFD700', polarity:'Polar', visColor:'Yellow', formula:'C₄₀H₅₆O₂', mw:'568.87', desc:'Xanthophyll with two alcohol groups. Polar — retained strongly on silica.' },
+    { id:'xan2',  name:'Xanthophyll 2 (Violaxanthin)', rf:0.15, color:'#DAA520', polarity:'Very polar', visColor:'Yellow', formula:'C₄₀H₅₆O₄', mw:'600.87', desc:'Most polar xanthophyll. Four polar oxygens cause strong retention.' },
+  ],
+  dye: [
+    { id:'tar',  name:'Tartrazine (E102)',    rf:0.38, color:'#FFD700', polarity:'Polar',     visColor:'Yellow', formula:'C₁₆H₉N₄Na₃O₉S₂', mw:'534.36', desc:'Yellow azo dye used in food and drinks. Very water soluble.' },
+    { id:'sun',  name:'Sunset Yellow (E110)', rf:0.52, color:'#FFA500', polarity:'Moderately polar', visColor:'Orange', formula:'C₁₆H₁₀N₂Na₂O₇S₂', mw:'452.37', desc:'Orange azo dye. Common in orange drinks and jelly.' },
+    { id:'all',  name:'Allura Red (E129)',    rf:0.31, color:'#CC0000', polarity:'Very polar', visColor:'Red',    formula:'C₁₈H₁₄N₂Na₂O₈S₂', mw:'496.42', desc:'Bright red azo dye. Present in red-coloured confectionery.' },
+    { id:'bri',  name:'Brilliant Blue (E133)',rf:0.62, color:'#0066CC', polarity:'Slightly polar', visColor:'Blue', formula:'C₃₇H₃₄N₂Na₂O₉S₃', mw:'792.86', desc:'Brilliant blue triphenylmethane dye. Used in blue/green foods.' },
+    { id:'ind',  name:'Indigo Carmine (E132)',rf:0.45, color:'#4B0082', polarity:'Polar',     visColor:'Indigo', formula:'C₁₆H₈N₂Na₂O₈S₂', mw:'466.35', desc:'Blue-indigo sulfonated dye. Used in confectionery.' },
+    { id:'pon',  name:'Ponceau 4R (E124)',    rf:0.28, color:'#FF4444', polarity:'Very polar', visColor:'Red',    formula:'C₂₀H₁₁N₂Na₃O₁₀S₃',mw:'604.47', desc:'Red azo dye. Strawberry red colour in drinks and cakes.' },
+  ],
+  organic: [
+    { id:'hex1',  name:'Hex-1-ene',    tr:3.5,  color:'#38bdf8', desc:'Volatile 6-carbon alkene. Low boiling point (63°C). Exits column first.',       bp:'63°C' },
+    { id:'eth',   name:'Ethanol',      tr:4.2,  color:'#818cf8', desc:'Common alcohol. bp 78°C. Polar, short retention time.',                           bp:'78°C' },
+    { id:'pro1',  name:'Propan-1-ol',  tr:6.1,  color:'#34d399', desc:'3-carbon alcohol. More polar than ethanol, longer retention time.',               bp:'97°C' },
+    { id:'hep',   name:'Heptane',      tr:8.5,  color:'#fb923c', desc:'7-carbon alkane. Reference compound in GLC. Non-polar.',                          bp:'98°C' },
+    { id:'but1',  name:'Butan-1-ol',   tr:9.3,  color:'#f472b6', desc:'4-carbon alcohol. Higher bp and polar interactions cause longer tR.',              bp:'118°C' },
+    { id:'pen2o', name:'Pentan-2-one', tr:14.0, color:'#a78bfa', desc:'Methyl propyl ketone. Polar carbonyl group causes long retention.',                bp:'102°C' },
+  ]
+};
+
+const ALL_SUBSTANCES = [
+  ...SUBSTANCES.amino.map(s=>({...s,type:'amino'})),
+  ...SUBSTANCES.pigment.map(s=>({...s,type:'pigment'})),
+  ...SUBSTANCES.dye.map(s=>({...s,type:'dye'})),
+  ...SUBSTANCES.organic.map(s=>({...s,type:'organic'})),
+];
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('[data-tab]').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll(`[data-tab="${name}"]`).forEach(a => a.classList.add('active'));
+  if (name === 'quiz' && !quizInitialized) initQuiz();
+  if (name === 'library') renderLibrary();
+}
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+document.getElementById('themeToggle').addEventListener('click', function() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeLbl').textContent = isDark ? 'LIGHT' : 'DARK';
+  redrawAll();
+});
+
+// ============================================================
+// COLLAPSIBLES
+// ============================================================
+function toggleCollapsible(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+// ============================================================
+// SIMULATOR TABS
+// ============================================================
+function switchSimType(type, btn) {
+  document.querySelectorAll('.sim-screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sim-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sim-' + type).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// TOAST NOTIFICATION
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// TLC SIMULATOR
+// ============================================================
+let tlcState = { running: false, progress: 0, selectedSubstances: [], anim: null, highlighted: null };
+
+function getThemeColors() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  return {
+    bg: dark ? '#1a2540' : '#f8faff',
+    plate: dark ? '#e8e4d4' : '#fffde7',
+    border: dark ? '#334155' : '#cbd5e1',
+    text: dark ? '#e8edf5' : '#0f172a',
+    baseline: dark ? '#94a3b8' : '#64748b',
+    solventLine: dark ? '#38bdf8' : '#0369a1',
+    solventFill: dark ? 'rgba(56,189,248,0.15)' : 'rgba(3,105,161,0.1)',
+    grid: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+  };
+}
+
+function tlcUpdateSubstances() {
+  const set = document.getElementById('tlcSampleSet').value;
+  const container = document.getElementById('tlcSubstanceChecks');
+  container.innerHTML = '';
+  SUBSTANCES[set].forEach((s, i) => {
+    const checked = i < 4 ? 'checked' : '';
+    container.innerHTML += `<div class="ctrl-checkbox-row">
+      <input type="checkbox" id="tlc_${s.id}" value="${s.id}" ${checked}>
+      <label for="tlc_${s.id}"><span class="color-swatch" style="background:${s.color}"></span>${s.name}</label>
+    </div>`;
+  });
+  resetTLC();
+}
+
+function getTlcSelected() {
+  const set = document.getElementById('tlcSampleSet').value;
+  const checked = [...document.querySelectorAll('#tlcSubstanceChecks input:checked')].map(e => e.value);
+  return SUBSTANCES[set].filter(s => checked.includes(s.id));
+}
+
+function resetTLC() {
+  cancelAnimationFrame(tlcState.anim);
+  tlcState = { running: false, progress: 0, selectedSubstances: [], anim: null, highlighted: null };
+  document.getElementById('tlcProgress').style.width = '0%';
+  document.getElementById('tlcStatusDot').className = 'status-dot idle';
+  document.getElementById('tlcStatusText').textContent = 'Ready';
+  document.getElementById('tlcDetailPanel').classList.remove('visible');
+  document.getElementById('tlcRfBody').innerHTML = '';
+  drawTLCPlate(0);
+}
+
+function runTLC() {
+  if (tlcState.running) return;
+  const subs = getTlcSelected();
+  if (subs.length === 0) { showToast('Select at least one substance!'); return; }
+  tlcState.selectedSubstances = subs;
+  tlcState.running = true;
+  tlcState.progress = 0;
+  document.getElementById('tlcStatusDot').className = 'status-dot running';
+  document.getElementById('tlcStatusText').textContent = 'Running...';
+  document.getElementById('tlcRfBody').innerHTML = '';
+  populateTlcTable(subs, 0);
+
+  function animate() {
+    tlcState.progress += 0.003;
+    if (tlcState.progress >= 1) {
+      tlcState.progress = 1;
+      tlcState.running = false;
+      document.getElementById('tlcStatusDot').className = 'status-dot';
+      document.getElementById('tlcStatusDot').style.background = 'var(--success)';
+      document.getElementById('tlcStatusText').textContent = 'Complete — Solvent front reached';
+    }
+    document.getElementById('tlcProgress').style.width = (tlcState.progress * 100) + '%';
+    drawTLCPlate(tlcState.progress);
+    populateTlcTable(subs, tlcState.progress);
+    if (tlcState.running) tlcState.anim = requestAnimationFrame(animate);
+  }
+  tlcState.anim = requestAnimationFrame(animate);
+}
+
+function drawTLCPlate(progress) {
+  const canvas = document.getElementById('tlcCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const c = getThemeColors();
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Plate background
+  ctx.fillStyle = c.plate;
+  ctx.strokeStyle = c.border;
+  ctx.lineWidth = 1.5;
+  const px = 40, py = 20, pw = W - 80, ph = H - 60;
+  ctx.beginPath();
+  ctx.roundRect(px, py, pw, ph, 4);
+  ctx.fill();
+  ctx.stroke();
+
+  // Grid lines
+  ctx.strokeStyle = c.grid;
+  ctx.lineWidth = 0.5;
+  for (let i = 1; i < 10; i++) {
+    const y = py + (ph / 10) * i;
+    ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(px + pw, y); ctx.stroke();
+  }
+
+  const baseY = py + ph - 30;
+  const topY = py + 20;
+  const totalH = baseY - topY;
+
+  // Solvent fill
+  const solventY = baseY - totalH * progress;
+  ctx.fillStyle = c.solventFill;
+  ctx.fillRect(px + 1, solventY, pw - 2, baseY - solventY);
+
+  // Solvent front line
+  if (progress > 0.02) {
+    ctx.strokeStyle = c.solventLine;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(px, solventY); ctx.lineTo(px + pw, solventY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = c.solventLine;
+    ctx.font = `10px 'Space Mono', monospace`;
+    ctx.fillText('Solvent Front', px + pw + 4, solventY + 4);
+  }
+
+  // Baseline
+  ctx.strokeStyle = c.baseline;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 2]);
+  ctx.beginPath(); ctx.moveTo(px, baseY); ctx.lineTo(px + pw, baseY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = c.baseline;
+  ctx.font = `10px 'Space Mono', monospace`;
+  ctx.fillText('Baseline', px + pw + 4, baseY + 4);
+
+  // Spots
+  const subs = tlcState.selectedSubstances;
+  if (subs.length > 0) {
+    const spacing = pw / (subs.length + 1);
+    subs.forEach((s, i) => {
+      const x = px + spacing * (i + 1);
+      const spotProgress = Math.min(progress, 1) * s.rf;
+      const spotY = baseY - totalH * spotProgress;
+
+      // Spot glow
+      if (tlcState.highlighted === s.id) {
+        const grad = ctx.createRadialGradient(x, spotY, 0, x, spotY, 22);
+        grad.addColorStop(0, s.color + 'aa');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(x, spotY, 22, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Spot
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = 0.85 + 0.15 * progress;
+      ctx.beginPath(); ctx.arc(x, spotY, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.arc(x, spotY, 8, 0, Math.PI * 2); ctx.stroke();
+
+      // Label at base (origin)
+      ctx.fillStyle = c.text;
+      ctx.font = `9px 'Space Mono', monospace`;
+      ctx.textAlign = 'center';
+      const label = s.name.split(' ')[0].substring(0, 5);
+      ctx.fillText(label, x, baseY + 18);
+
+      // Draw trail
+      if (progress > 0.05 && spotProgress > 0.02) {
+        ctx.strokeStyle = s.color + '30';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x, baseY); ctx.lineTo(x, spotY + 8); ctx.stroke();
+      }
+    });
+    ctx.textAlign = 'left';
+  }
+
+  // Ruler
+  ctx.fillStyle = c.baseline;
+  ctx.font = `9px 'Space Mono', monospace`;
+  for (let i = 0; i <= 10; i++) {
+    const y = baseY - (totalH / 10) * i;
+    ctx.fillText(i, px - 22, y + 4);
+    ctx.strokeStyle = c.border;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(px - 5, y); ctx.lineTo(px, y); ctx.stroke();
+  }
+  ctx.fillStyle = c.text;
+  ctx.save();
+  ctx.translate(px - 32, py + ph / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.font = `9px 'Space Mono', monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Distance (cm)', 0, 0);
+  ctx.restore();
+}
+
+function populateTlcTable(subs, progress) {
+  const tbody = document.getElementById('tlcRfBody');
+  tbody.innerHTML = '';
+  subs.forEach((s, i) => {
+    const dist = (s.rf * 10 * progress).toFixed(1);
+    const rfDisp = progress >= 1 ? s.rf.toFixed(2) : (progress > 0.1 ? (s.rf * progress / progress).toFixed(2) : '—');
+    const highlighted = tlcState.highlighted === s.id ? 'highlighted' : '';
+    tbody.innerHTML += `<tr class="${highlighted}" data-id="${s.id}" onclick="highlightTlc('${s.id}', ${s.rf}, '${dist}', '${s.polarity}')">
+      <td>${i+1}</td>
+      <td><span class="color-swatch" style="background:${s.color}"></span>${s.name}</td>
+      <td><span style="color:${s.color}">■</span> ${s.color}</td>
+      <td><strong>${progress >= 1 ? s.rf.toFixed(2) : '...'}</strong></td>
+      <td>${dist}</td>
+    </tr>`;
+  });
+}
+
+function highlightTlc(id, rf, dist, polarity) {
+  tlcState.highlighted = tlcState.highlighted === id ? null : id;
+  drawTLCPlate(tlcState.progress);
+  populateTlcTable(tlcState.selectedSubstances, tlcState.progress);
+  const s = tlcState.selectedSubstances.find(x => x.id === id);
+  if (s && tlcState.highlighted) {
+    document.getElementById('tlcDetailPanel').classList.add('visible');
+    document.getElementById('tdName').textContent = s.name;
+    document.getElementById('tdRf').textContent = s.rf.toFixed(2);
+    document.getElementById('tdDist').textContent = (s.rf * 10 * tlcState.progress).toFixed(2) + ' cm';
+    document.getElementById('tdFront').textContent = (10 * tlcState.progress).toFixed(1) + ' cm';
+    document.getElementById('tdPol').textContent = s.polarity;
+    document.getElementById('tdCalc').textContent = `${(s.rf*10*tlcState.progress).toFixed(2)} ÷ ${(10*tlcState.progress).toFixed(2)} = ${s.rf.toFixed(2)}`;
+  }
+}
+
+// ============================================================
+// PAPER CHROMATOGRAPHY SIMULATOR
+// ============================================================
+let paperState = { running: false, progress: 0, subs: [], anim: null, hoverId: null };
+
+function paperUpdateSubstances() {
+  const set = document.getElementById('paperSample').value;
+  const container = document.getElementById('paperSubChecks');
+  container.innerHTML = '';
+  SUBSTANCES[set].forEach((s, i) => {
+    const checked = i < 5 ? 'checked' : '';
+    container.innerHTML += `<div class="ctrl-checkbox-row">
+      <input type="checkbox" id="paper_${s.id}" value="${s.id}" ${checked}>
+      <label for="paper_${s.id}"><span class="color-swatch" style="background:${s.color}"></span>${s.name}</label>
+    </div>`;
+  });
+  resetPaper();
+}
+
+function getPaperSelected() {
+  const set = document.getElementById('paperSample').value;
+  const checked = [...document.querySelectorAll('#paperSubChecks input:checked')].map(e => e.value);
+  return SUBSTANCES[set].filter(s => checked.includes(s.id));
+}
+
+function resetPaper() {
+  cancelAnimationFrame(paperState.anim);
+  paperState = { running: false, progress: 0, subs: [], anim: null, hoverId: null };
+  document.getElementById('paperProgress').style.width = '0%';
+  document.getElementById('paperStatusDot').className = 'status-dot idle';
+  document.getElementById('paperStatusText').textContent = 'Ready';
+  document.getElementById('paperRfBody').innerHTML = '';
+  drawPaper(0, []);
+}
+
+function runPaper() {
+  if (paperState.running) return;
+  const subs = getPaperSelected();
+  if (subs.length === 0) { showToast('Select at least one substance!'); return; }
+  paperState.subs = subs;
+  paperState.running = true;
+  paperState.progress = 0;
+  document.getElementById('paperStatusDot').className = 'status-dot running';
+  document.getElementById('paperStatusText').textContent = 'Solvent rising...';
+
+  function animate() {
+    paperState.progress += 0.0025;
+    if (paperState.progress >= 1) {
+      paperState.progress = 1;
+      paperState.running = false;
+      document.getElementById('paperStatusDot').className = 'status-dot';
+      document.getElementById('paperStatusDot').style.background = 'var(--success)';
+      document.getElementById('paperStatusText').textContent = 'Complete';
+      populatePaperTable(subs);
+    }
+    document.getElementById('paperProgress').style.width = (paperState.progress * 100) + '%';
+    drawPaper(paperState.progress, subs);
+    if (paperState.running) paperState.anim = requestAnimationFrame(animate);
+  }
+  paperState.anim = requestAnimationFrame(animate);
+}
+
+function drawPaper(progress, subs) {
+  const canvas = document.getElementById('paperCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const c = getThemeColors();
+  ctx.clearRect(0, 0, W, H);
+
+  // Beaker
+  ctx.strokeStyle = c.border;
+  ctx.lineWidth = 2;
+  ctx.fillStyle = c.bg;
+  ctx.beginPath();
+  ctx.roundRect(20, 60, W - 40, H - 80, [0, 0, 12, 12]);
+  ctx.fill(); ctx.stroke();
+
+  // Solvent at bottom
+  const solventH = 50;
+  ctx.fillStyle = 'rgba(56,189,248,0.15)';
+  ctx.fillRect(21, H - 80, W - 42, solventH);
+  ctx.strokeStyle = 'rgba(56,189,248,0.5)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(21, H - 80); ctx.lineTo(W - 21, H - 80); ctx.stroke();
+
+  // Label: solvent
+  ctx.fillStyle = c.solventLine;
+  ctx.font = `9px 'Space Mono', monospace`;
+  ctx.fillText('Solvent (mobile phase)', 28, H - 65);
+
+  // Paper strip
+  const paperX = W / 2 - 50;
+  const paperW = 100;
+  const paperBottom = H - 30;
+  const paperTop = 70;
+  const paperH = paperBottom - paperTop;
+
+  ctx.fillStyle = '#fefce8';
+  ctx.strokeStyle = c.border;
+  ctx.lineWidth = 1;
+  ctx.fillRect(paperX, paperTop, paperW, paperH);
+  ctx.strokeRect(paperX, paperTop, paperW, paperH);
+
+  // Baseline
+  const baseY = paperBottom - 60;
+  ctx.strokeStyle = c.baseline;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 2]);
+  ctx.beginPath(); ctx.moveTo(paperX, baseY); ctx.lineTo(paperX + paperW, baseY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Solvent front on paper
+  const frontY = baseY - (baseY - paperTop - 20) * progress;
+  if (progress > 0.02) {
+    ctx.strokeStyle = c.solventLine;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 2]);
+    ctx.beginPath(); ctx.moveTo(paperX - 5, frontY); ctx.lineTo(paperX + paperW + 5, frontY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = c.solventLine;
+    ctx.font = `8px 'Space Mono', monospace`;
+    ctx.fillText('SF', paperX + paperW + 7, frontY + 4);
+  }
+
+  // Wet zone
+  if (progress > 0) {
+    ctx.fillStyle = 'rgba(56,189,248,0.06)';
+    ctx.fillRect(paperX + 1, frontY, paperW - 2, baseY - frontY);
+  }
+
+  // Bands (substances)
+  const maxH = baseY - paperTop - 20;
+  subs.forEach((s) => {
+    const bandY = baseY - maxH * Math.min(progress, 1) * s.rf;
+    const bandH = 12;
+
+    // Gradient band
+    const grad = ctx.createLinearGradient(paperX, bandY - bandH / 2, paperX + paperW, bandY + bandH / 2);
+    grad.addColorStop(0, s.color + '80');
+    grad.addColorStop(0.5, s.color + 'cc');
+    grad.addColorStop(1, s.color + '80');
+    ctx.fillStyle = grad;
+    ctx.fillRect(paperX + 4, bandY - bandH / 2, paperW - 8, bandH);
+
+    if (progress >= 1) {
+      ctx.fillStyle = c.text;
+      ctx.font = `8px 'Space Mono', monospace`;
+      ctx.textAlign = 'right';
+      ctx.fillText(s.name.split(' ')[0], paperX - 6, bandY + 3);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = c.solventLine;
+      ctx.fillText('Rf=' + s.rf.toFixed(2), paperX + paperW + 5, bandY + 3);
+    }
+  });
+
+  // Origin spot
+  ctx.fillStyle = '#888';
+  ctx.beginPath(); ctx.arc(W / 2, baseY, 5, 0, Math.PI * 2); ctx.fill();
+
+  // Paper clip
+  ctx.strokeStyle = '#aaa';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 8, paperTop + 5);
+  ctx.lineTo(W / 2 + 8, paperTop + 5);
+  ctx.stroke();
+
+  // Ruler on side
+  ctx.fillStyle = c.baseline;
+  ctx.font = `8px 'Space Mono', monospace`;
+  for (let i = 0; i <= 10; i++) {
+    const y = baseY - (maxH / 10) * i;
+    ctx.fillText(i, paperX - 20, y + 3);
+  }
+}
+
+function populatePaperTable(subs) {
+  const tbody = document.getElementById('paperRfBody');
+  tbody.innerHTML = '';
+  subs.forEach(s => {
+    tbody.innerHTML += `<tr onclick="highlightPaper('${s.id}')">
+      <td><span class="color-swatch" style="background:${s.color}"></span>${s.name}</td>
+      <td><span style="color:${s.color}">■</span> ${s.visColor || s.color}</td>
+      <td><strong>${s.rf.toFixed(2)}</strong></td>
+    </tr>`;
+  });
+}
+
+function highlightPaper(id) {
+  const s = paperState.subs.find(x => x.id === id);
+  if (s) {
+    document.getElementById('pdName').textContent = s.name;
+    document.getElementById('pdRf').textContent = s.rf.toFixed(2);
+    document.getElementById('pdCol').textContent = s.visColor || s.color;
+  }
+}
+
+// ============================================================
+// COLUMN CHROMATOGRAPHY SIMULATOR
+// ============================================================
+let colState = { running: false, progress: 0, subs: [], anim: null, elutionData: [] };
+let colElutionT = 0;
+
+function columnUpdateSubstances() {
+  const set = document.getElementById('colSample').value;
+  const container = document.getElementById('colSubChecks');
+  container.innerHTML = '';
+  SUBSTANCES[set].forEach((s, i) => {
+    const checked = i < 4 ? 'checked' : '';
+    container.innerHTML += `<div class="ctrl-checkbox-row">
+      <input type="checkbox" id="col_${s.id}" value="${s.id}" ${checked}>
+      <label for="col_${s.id}"><span class="color-swatch" style="background:${s.color}"></span>${s.name}</label>
+    </div>`;
+  });
+  resetColumn();
+}
+
+function getColumnSelected() {
+  const set = document.getElementById('colSample').value;
+  const checked = [...document.querySelectorAll('#colSubChecks input:checked')].map(e => e.value);
+  return SUBSTANCES[set].filter(s => checked.includes(s.id));
+}
+
+function resetColumn() {
+  cancelAnimationFrame(colState.anim);
+  colState = { running: false, progress: 0, subs: [], anim: null, elutionData: [] };
+  colElutionT = 0;
+  document.getElementById('colProgress').style.width = '0%';
+  document.getElementById('colStatusDot').className = 'status-dot idle';
+  document.getElementById('colStatusText').textContent = 'Ready';
+  document.getElementById('colElutionBody').innerHTML = '';
+  drawColumn(0, []);
+  clearColumnElution();
+}
+
+function runColumn() {
+  if (colState.running) return;
+  const subs = getColumnSelected();
+  if (subs.length === 0) { showToast('Select at least one substance!'); return; }
+  // Sort by rf descending (least polar = highest Rf exits first)
+  const sorted = [...subs].sort((a, b) => b.rf - a.rf);
+  colState.subs = sorted;
+  colState.running = true;
+  colState.progress = 0;
+  colElutionT = 0;
+  colState.elutionData = [];
+  document.getElementById('colStatusDot').className = 'status-dot running';
+  document.getElementById('colStatusText').textContent = 'Eluting...';
+
+  function animate() {
+    colState.progress += 0.0015;
+    colElutionT += 0.5;
+    if (colState.progress >= 1) {
+      colState.progress = 1;
+      colState.running = false;
+      document.getElementById('colStatusDot').className = 'status-dot';
+      document.getElementById('colStatusDot').style.background = 'var(--success)';
+      document.getElementById('colStatusText').textContent = 'All fractions collected';
+      populateColumnTable(sorted);
+    }
+    document.getElementById('colProgress').style.width = (colState.progress * 100) + '%';
+    drawColumn(colState.progress, sorted);
+    drawColumnElution(colState.progress, sorted, colElutionT);
+    if (colState.running) colState.anim = requestAnimationFrame(animate);
+  }
+  colState.anim = requestAnimationFrame(animate);
+}
+
+function drawColumn(progress, subs) {
+  const canvas = document.getElementById('columnCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const c = getThemeColors();
+  ctx.clearRect(0, 0, W, H);
+
+  const cx = W / 2;
+  const colW = 70;
+  const colX = cx - colW / 2;
+  const colTop = 60;
+  const colBot = H - 80;
+  const colH = colBot - colTop;
+
+  // Column glass
+  ctx.fillStyle = c.bg;
+  ctx.strokeStyle = c.border;
+  ctx.lineWidth = 2;
+  ctx.fillRect(colX, colTop, colW, colH);
+  ctx.strokeRect(colX, colTop, colW, colH);
+
+  // Column packing (silica)
+  const silicaGrad = ctx.createLinearGradient(colX, colTop, colX + colW, colTop);
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  silicaGrad.addColorStop(0, dark ? '#2d3a4a' : '#f0f4fa');
+  silicaGrad.addColorStop(1, dark ? '#1e2d3d' : '#e0eaf8');
+  ctx.fillStyle = silicaGrad;
+  ctx.fillRect(colX + 2, colTop + 2, colW - 4, colH - 4);
+
+  // Solvent
+  const solH = colH * progress * 0.3;
+  ctx.fillStyle = 'rgba(56,189,248,0.2)';
+  ctx.fillRect(colX + 2, colTop + 2, colW - 4, solH);
+
+  // Draw bands
+  if (subs.length > 0) {
+    const bandH = 24;
+    subs.forEach((s, i) => {
+      // Bands start at top and move down as progress increases
+      // Higher Rf = moves faster = lower in column sooner
+      const startPos = 0.05;
+      const bandPos = startPos + (colH - bandH - 10) * progress * s.rf * 0.9;
+      const bandY = colTop + Math.min(bandPos, colH - bandH);
+
+      const grad = ctx.createLinearGradient(colX, bandY, colX + colW, bandY);
+      grad.addColorStop(0, s.color + '90');
+      grad.addColorStop(0.5, s.color + 'dd');
+      grad.addColorStop(1, s.color + '90');
+      ctx.fillStyle = grad;
+      ctx.fillRect(colX + 2, bandY, colW - 4, bandH);
+
+      // Label
+      ctx.fillStyle = c.text;
+      ctx.font = `8px 'Space Mono', monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(s.name.split(' ')[0].substring(0, 7), cx, bandY + bandH / 2 + 3);
+    });
+    ctx.textAlign = 'left';
+  }
+
+  // Stopcock at bottom
+  ctx.fillStyle = c.border;
+  ctx.fillRect(cx - 8, colBot, 16, 12);
+
+  // Eluent drips
+  if (progress > 0.1 && subs.length > 0) {
+    const firstSub = subs[0]; // highest Rf exits first
+    if (progress * firstSub.rf > 0.8) {
+      ctx.fillStyle = firstSub.color;
+      ctx.beginPath();
+      const dropY = colBot + 12 + (Math.sin(Date.now() / 200) * 5);
+      ctx.arc(cx, dropY + 10, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Labels
+  ctx.fillStyle = c.text;
+  ctx.font = `9px 'Space Mono', monospace`;
+  ctx.fillText('Solvent →', colX - 55, colTop + 20);
+  ctx.fillText('↑ Eluent', colX - 45, colBot + 40);
+
+  ctx.save();
+  ctx.translate(colX - 10, colTop + colH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Stationary Phase (Silica)', 0, 0);
+  ctx.restore();
+}
+
+function clearColumnElution() {
+  const canvas = document.getElementById('columnElutionCanvas');
+  const ctx = canvas.getContext('2d');
+  const c = getThemeColors();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = c.bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawColumnElution(progress, subs, t) {
+  const canvas = document.getElementById('columnElutionCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const c = getThemeColors();
+  ctx.clearRect(0, 0, W, H);
+
+  const marginL = 50, marginB = 40, marginT = 20, marginR = 20;
+  const plotW = W - marginL - marginR;
+  const plotH = H - marginT - marginB;
+
+  // Background
+  ctx.fillStyle = c.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Axes
+  ctx.strokeStyle = c.border;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(marginL, marginT); ctx.lineTo(marginL, marginT + plotH);
+  ctx.lineTo(marginL + plotW, marginT + plotH);
+  ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = c.text;
+  ctx.font = `9px 'Space Mono', monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Volume Collected (cm³)', marginL + plotW / 2, H - 8);
+  ctx.save();
+  ctx.translate(12, marginT + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('UV Absorbance', 0, 0);
+  ctx.restore();
+  ctx.textAlign = 'left';
+
+  // Draw peaks
+  subs.forEach((s, i) => {
+    const elutionVol = 20 + (1 - s.rf) * 80; // higher Rf exits at lower volume
+    const peakProgress = progress * 1.3;
+    const xCenter = marginL + (elutionVol / 110) * plotW;
+
+    ctx.beginPath();
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 2;
+    for (let x = marginL; x < marginL + plotW; x++) {
+      const vol = ((x - marginL) / plotW) * 110;
+      const sigma = 4;
+      const amp = plotH * 0.7 * Math.min(1, peakProgress - (elutionVol / 110) + 0.1) * 1.5;
+      const y = amp > 0 ? amp * Math.exp(-Math.pow(vol - elutionVol, 2) / (2 * sigma * sigma)) : 0;
+      const screenY = marginT + plotH - y;
+      if (x === marginL) ctx.moveTo(x, screenY);
+      else ctx.lineTo(x, screenY);
+    }
+    ctx.stroke();
+
+    // Label peak
+    if (peakProgress > elutionVol / 110) {
+      ctx.fillStyle = s.color;
+      ctx.font = `8px 'Space Mono', monospace`;
+      ctx.textAlign = 'center';
+      const labelY = marginT + plotH * 0.15 + i * 14;
+      ctx.fillText(s.name.split(' ')[0], xCenter, labelY);
+    }
+  });
+  ctx.textAlign = 'left';
+
+  // Volume axis labels
+  ctx.fillStyle = c.baseline;
+  ctx.font = `8px 'Space Mono', monospace`;
+  for (let v = 0; v <= 100; v += 20) {
+    const x = marginL + (v / 110) * plotW;
+    ctx.fillText(v, x - 6, marginT + plotH + 16);
+  }
+}
+
+function populateColumnTable(subs) {
+  const tbody = document.getElementById('colElutionBody');
+  tbody.innerHTML = '';
+  subs.forEach((s, i) => {
+    const vol = (20 + (1 - s.rf) * 80).toFixed(0);
+    tbody.innerHTML += `<tr>
+      <td><span class="color-swatch" style="background:${s.color}"></span>${s.name}</td>
+      <td>${i + 1}${i===0?' (first)':''}</td>
+      <td>~${vol} cm³</td>
+    </tr>`;
+  });
+}
+
+// ============================================================
+// GLC SIMULATOR
+// ============================================================
+let glcState = { running: false, progress: 0, subs: [], anim: null, timeData: [], signalData: [] };
+
+const GLC_TOTAL_TIME = 22;
+
+function glcUpdateSubstances() {
+  const set = document.getElementById('glcSample').value;
+  const container = document.getElementById('glcSubChecks');
+  container.innerHTML = '';
+  const data = set === 'alcohols'
+    ? SUBSTANCES.organic.filter(s => s.name.includes('ol') || s.name.includes('Ethanol'))
+    : set === 'fuels'
+    ? SUBSTANCES.organic.filter(s => ['hex1','hep','pen2o'].includes(s.id))
+    : SUBSTANCES.organic;
+  data.forEach((s, i) => {
+    const checked = i < 4 ? 'checked' : '';
+    container.innerHTML += `<div class="ctrl-checkbox-row">
+      <input type="checkbox" id="glc_${s.id}" value="${s.id}" ${checked}>
+      <label for="glc_${s.id}"><span class="color-swatch" style="background:${s.color}"></span>${s.name} (t<sub>R</sub>=${s.tr} min)</label>
+    </div>`;
+  });
+  resetGLC();
+}
+
+function getGlcSelected() {
+  const set = document.getElementById('glcSample').value;
+  const data = set === 'alcohols'
+    ? SUBSTANCES.organic.filter(s => s.name.includes('ol') || s.name.includes('Ethanol'))
+    : set === 'fuels'
+    ? SUBSTANCES.organic.filter(s => ['hex1','hep','pen2o'].includes(s.id))
+    : SUBSTANCES.organic;
+  const checked = [...document.querySelectorAll('#glcSubChecks input:checked')].map(e => e.value);
+  return data.filter(s => checked.includes(s.id));
+}
+
+function resetGLC() {
+  cancelAnimationFrame(glcState.anim);
+  glcState = { running: false, progress: 0, subs: [], anim: null, timeData: [], signalData: [] };
+  document.getElementById('glcProgress').style.width = '0%';
+  document.getElementById('glcStatusDot').className = 'status-dot idle';
+  document.getElementById('glcStatusText').textContent = 'Ready — awaiting injection';
+  document.getElementById('glcResultBody').innerHTML = '';
+  document.getElementById('glcTimeDisplay').textContent = '0.0 min';
+  document.getElementById('glcPeakCount').textContent = '0';
+  document.getElementById('glcSignalDisplay').textContent = '0.00';
+  document.getElementById('glcLastPeak').textContent = '—';
+  drawGLC([], [], [], 0);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('glcTemp').addEventListener('input', function() {
+    document.getElementById('glcTempVal').textContent = this.value + '°C';
+  });
+});
+
+function runGLC() {
+  if (glcState.running) return;
+  const subs = getGlcSelected();
+  if (subs.length === 0) { showToast('Select at least one compound!'); return; }
+  glcState.subs = subs;
+  glcState.running = true;
+  glcState.progress = 0;
+  glcState.timeData = [];
+  glcState.signalData = [];
+  document.getElementById('glcStatusDot').className = 'status-dot running';
+  document.getElementById('glcStatusText').textContent = 'Running...';
+  document.getElementById('glcResultBody').innerHTML = '';
+
+  const temp = parseInt(document.getElementById('glcTemp').value);
+  const tempFactor = 1 + (temp - 150) * 0.003; // temperature effect on retention
+
+  let detectedPeaks = 0;
+
+  function animate() {
+    glcState.progress += 0.0018;
+    const currentTime = glcState.progress * GLC_TOTAL_TIME;
+    glcState.timeData.push(currentTime);
+
+    let signal = 0;
+    subs.forEach(s => {
+      const tr = s.tr / tempFactor;
+      const sigma = 0.3;
+      const peak = 0.9 * Math.exp(-Math.pow(currentTime - tr, 2) / (2 * sigma * sigma));
+      signal += peak;
+    });
+    // Add baseline noise
+    signal += Math.random() * 0.005;
+    glcState.signalData.push(signal);
+
+    document.getElementById('glcTimeDisplay').textContent = currentTime.toFixed(1) + ' min';
+    document.getElementById('glcSignalDisplay').textContent = signal.toFixed(3);
+    document.getElementById('glcProgress').style.width = (glcState.progress * 100) + '%';
+
+    // Count detected peaks
+    const newPeaks = subs.filter(s => currentTime > s.tr / tempFactor + 0.5).length;
+    if (newPeaks > detectedPeaks) {
+      detectedPeaks = newPeaks;
+      document.getElementById('glcPeakCount').textContent = detectedPeaks;
+      const lastSub = subs.filter(s => currentTime > s.tr / tempFactor + 0.5).pop();
+      if (lastSub) document.getElementById('glcLastPeak').textContent = lastSub.name;
+    }
+
+    drawGLC(glcState.timeData, glcState.signalData, subs, tempFactor);
+
+    if (glcState.progress >= 1) {
+      glcState.progress = 1;
+      glcState.running = false;
+      document.getElementById('glcStatusDot').className = 'status-dot';
+      document.getElementById('glcStatusDot').style.background = 'var(--success)';
+      document.getElementById('glcStatusText').textContent = 'Run complete';
+      populateGLCTable(subs, tempFactor);
+    } else {
+      glcState.anim = requestAnimationFrame(animate);
+    }
+  }
+  glcState.anim = requestAnimationFrame(animate);
+}
+
+function drawGLC(times, signals, subs, tempFactor = 1) {
+  const canvas = document.getElementById('glcCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const c = getThemeColors();
+  ctx.clearRect(0, 0, W, H);
+
+  const marginL = 55, marginB = 45, marginT = 20, marginR = 25;
+  const plotW = W - marginL - marginR;
+  const plotH = H - marginT - marginB;
+
+  ctx.fillStyle = c.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = c.grid;
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = marginT + (plotH / 5) * i;
+    ctx.beginPath(); ctx.moveTo(marginL, y); ctx.lineTo(marginL + plotW, y); ctx.stroke();
+  }
+  for (let t = 0; t <= GLC_TOTAL_TIME; t += 4) {
+    const x = marginL + (t / GLC_TOTAL_TIME) * plotW;
+    ctx.beginPath(); ctx.moveTo(x, marginT); ctx.lineTo(x, marginT + plotH); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = c.border;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(marginL, marginT); ctx.lineTo(marginL, marginT + plotH);
+  ctx.lineTo(marginL + plotW, marginT + plotH);
+  ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = c.text;
+  ctx.font = `10px 'Space Mono', monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Retention Time (minutes)', marginL + plotW / 2, H - 8);
+  ctx.save();
+  ctx.translate(14, marginT + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Signal (Detector Response)', 0, 0);
+  ctx.restore();
+  ctx.textAlign = 'left';
+
+  // Time axis labels
+  ctx.fillStyle = c.baseline;
+  ctx.font = `9px 'Space Mono', monospace`;
+  for (let t = 0; t <= GLC_TOTAL_TIME; t += 4) {
+    const x = marginL + (t / GLC_TOTAL_TIME) * plotW;
+    ctx.textAlign = 'center';
+    ctx.fillText(t, x, marginT + plotH + 18);
+  }
+
+  // Y axis labels
+  for (let i = 0; i <= 5; i++) {
+    const y = marginT + (plotH / 5) * i;
+    ctx.textAlign = 'right';
+    ctx.fillText((1 - i / 5).toFixed(1), marginL - 6, y + 4);
+  }
+  ctx.textAlign = 'left';
+
+  // Peak reference lines & labels (always shown)
+  if (subs.length > 0) {
+    subs.forEach(s => {
+      const tr = s.tr / tempFactor;
+      const x = marginL + (tr / GLC_TOTAL_TIME) * plotW;
+      ctx.strokeStyle = s.color + '40';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(x, marginT); ctx.lineTo(x, marginT + plotH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = s.color;
+      ctx.font = `9px 'Space Mono', monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(s.name.split(' ')[0], x, marginT - 5);
+    });
+    ctx.textAlign = 'left';
+  }
+
+  if (times.length < 2) return;
+
+  // Draw chromatogram trace
+  ctx.strokeStyle = 'var(--accent)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  times.forEach((t, i) => {
+    const x = marginL + (t / GLC_TOTAL_TIME) * plotW;
+    const y = marginT + plotH - signals[i] * plotH * 0.9;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Individual peak shading
+  if (glcState.progress >= 1) {
+    subs.forEach(s => {
+      const tr = s.tr / tempFactor;
+      ctx.fillStyle = s.color + '30';
+      ctx.beginPath();
+      const sigma = 0.3;
+      ctx.moveTo(marginL + ((tr - 1.5) / GLC_TOTAL_TIME) * plotW, marginT + plotH);
+      for (let t = tr - 1.5; t <= tr + 1.5; t += 0.05) {
+        const peak = 0.9 * Math.exp(-Math.pow(t - tr, 2) / (2 * sigma * sigma));
+        const x = marginL + (t / GLC_TOTAL_TIME) * plotW;
+        const y = marginT + plotH - peak * plotH * 0.9;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(marginL + ((tr + 1.5) / GLC_TOTAL_TIME) * plotW, marginT + plotH);
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
+
+  // Injection marker
+  ctx.fillStyle = c.solventLine;
+  ctx.font = `9px 'Space Mono', monospace`;
+  ctx.fillText('↑ Inject', marginL - 4, marginT + plotH + 30);
+}
+
+function populateGLCTable(subs, tempFactor) {
+  const tbody = document.getElementById('glcResultBody');
+  tbody.innerHTML = '';
+  const sigma = 0.3;
+  const totalArea = subs.length * Math.sqrt(2 * Math.PI) * sigma * 0.9;
+  subs.forEach(s => {
+    const tr = (s.tr / tempFactor).toFixed(2);
+    const area = (Math.sqrt(2 * Math.PI) * sigma * 0.9).toFixed(3);
+    const pct = (100 / subs.length).toFixed(1); // uniform for demo
+    tbody.innerHTML += `<tr>
+      <td><span class="color-swatch" style="background:${s.color}"></span>${s.name}</td>
+      <td>${tr}</td>
+      <td>${area}</td>
+      <td>${pct}%</td>
+    </tr>`;
+  });
+}
+
+function redrawAll() {
+  drawTLCPlate(tlcState.progress);
+  drawPaper(paperState.progress, paperState.subs);
+  drawColumn(colState.progress, colState.subs);
+  drawGLC(glcState.timeData, glcState.signalData, glcState.subs);
+}
+
+// ============================================================
+// CALCULATIONS
+// ============================================================
+function calcRf() {
+  const dist = parseFloat(document.getElementById('rfDist').value);
+  const front = parseFloat(document.getElementById('rfFront').value);
+  const result = document.getElementById('rfResult');
+  const val = document.getElementById('rfResultVal');
+  const step = document.getElementById('rfResultStep');
+
+  if (isNaN(dist) || isNaN(front) || front <= 0) {
+    showToast('Please enter valid distances.');
+    return;
+  }
+  if (dist > front) { showToast('Substance cannot travel beyond solvent front!'); return; }
+
+  const rf = dist / front;
+  result.classList.add('show');
+  val.textContent = `Rf = ${rf.toFixed(3)}`;
+  step.innerHTML = `Rf = ${dist} ÷ ${front} = <strong>${rf.toFixed(3)}</strong><br>
+  ${rf < 0.2 ? '→ Very polar substance (strongly retained)' : rf < 0.5 ? '→ Moderately polar substance' : '→ Relatively non-polar substance (weakly retained)'}`;
+}
+
+function calcComposition() {
+  const rows = document.querySelectorAll('.peak-row');
+  let components = [];
+  let totalArea = 0;
+
+  rows.forEach(row => {
+    const base = parseFloat(row.querySelector('.peak-base').value);
+    const height = parseFloat(row.querySelector('.peak-height').value);
+    const name = row.querySelector('.peak-name').value || 'Unknown';
+    if (!isNaN(base) && !isNaN(height) && base > 0 && height > 0) {
+      const area = 0.5 * base * height;
+      components.push({ name, base, height, area });
+      totalArea += area;
+    }
+  });
+
+  if (components.length === 0) { showToast('Enter at least one peak.'); return; }
+
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem">';
+  html += '<tr><th style="border:1px solid var(--border);padding:5px;color:var(--accent)">Component</th><th style="border:1px solid var(--border);padding:5px;color:var(--accent)">Area (½bh)</th><th style="border:1px solid var(--border);padding:5px;color:var(--accent)">%</th></tr>';
+  components.forEach(c => {
+    const pct = (c.area / totalArea * 100).toFixed(1);
+    html += `<tr><td style="border:1px solid var(--border);padding:5px;color:var(--text-secondary)">${c.name}</td>
+    <td style="border:1px solid var(--border);padding:5px;color:var(--text-secondary)">${c.area.toFixed(3)}</td>
+    <td style="border:1px solid var(--border);padding:5px;color:var(--accent)">${pct}%</td></tr>`;
+  });
+  html += `</table><div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted)">Total area: ${totalArea.toFixed(3)}</div>`;
+
+  document.getElementById('compResult').classList.add('show');
+  document.getElementById('compResultStep').innerHTML = html;
+}
+
+function addPeakRow() {
+  const container = document.getElementById('peakRows');
+  const idx = document.querySelectorAll('.peak-row').length + 1;
+  const row = document.createElement('div');
+  row.className = 'calc-row peak-row';
+  row.innerHTML = `
+    <div class="calc-field"><label>Peak ${idx} — Base (min)</label><input type="number" class="peak-base" placeholder="" step="0.1"></div>
+    <div class="calc-field"><label>Height (cm)</label><input type="number" class="peak-height" placeholder="" step="0.1"></div>
+    <div class="calc-field"><label>Name</label><input type="text" class="peak-name" placeholder=""></div>`;
+  container.appendChild(row);
+}
+
+function identifyUnknown() {
+  const rfVal = parseFloat(document.getElementById('unknownRf').value);
+  const type = document.getElementById('unknownType').value;
+  const tol = parseFloat(document.getElementById('unknownTol').value) || 0.05;
+
+  if (isNaN(rfVal) || rfVal < 0 || rfVal > 1) { showToast('Enter a valid Rf (0–1).'); return; }
+
+  let pool = ALL_SUBSTANCES.filter(s => s.rf !== undefined);
+  if (type !== 'all') pool = pool.filter(s => s.type === type);
+
+  const matches = pool.filter(s => Math.abs(s.rf - rfVal) <= tol);
+  const sorted = matches.sort((a, b) => Math.abs(a.rf - rfVal) - Math.abs(b.rf - rfVal));
+
+  const result = document.getElementById('unknownResult');
+  result.classList.add('show');
+
+  if (sorted.length === 0) {
+    document.getElementById('unknownResultStep').innerHTML = `<span style="color:var(--danger)">No match found within ±${tol} of Rf = ${rfVal}</span>. Try increasing tolerance.`;
+    return;
+  }
+
+  let html = `<div style="color:var(--accent3);margin-bottom:8px;font-size:0.85rem">Found ${sorted.length} match(es) for Rf = ${rfVal} ± ${tol}:</div>`;
+  sorted.forEach(s => {
+    const diff = Math.abs(s.rf - rfVal).toFixed(3);
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:6px;background:var(--bg-card);border-radius:4px;border:1px solid var(--border)">
+      <span class="color-swatch" style="background:${s.color};width:16px;height:16px;border-radius:3px"></span>
+      <strong style="color:var(--text-primary)">${s.name}</strong>
+      <span style="color:var(--text-muted);font-size:0.75rem">${s.type}</span>
+      <span style="margin-left:auto;color:var(--accent)">Rf=${s.rf} (Δ=${diff})</span>
+    </div>`;
+  });
+  document.getElementById('unknownResultStep').innerHTML = html;
+}
+
+function assessPurity() {
+  const n = parseInt(document.getElementById('spotCount').value);
+  const result = document.getElementById('purityResult');
+  result.classList.add('show');
+  let html = '';
+  if (isNaN(n) || n < 1) { html = '<span style="color:var(--danger)">Enter a valid number.</span>'; }
+  else if (n === 1) {
+    html = `<span class="result-val" style="color:var(--success)">Likely PURE</span><br><div class="result-step">One spot indicates a single component. Confirm purity by running with a reference compound and testing in at least two different solvent systems — coincidence of Rf in multiple solvents is strong evidence of identity and purity.</div>`;
+  } else {
+    html = `<span class="result-val" style="color:var(--danger)">IMPURE MIXTURE</span><br><div class="result-step">${n} spots indicate ${n} components present. The sample is a mixture. To isolate the desired compound, consider column chromatography for preparative separation. For analytical confirmation, co-spot with a reference of the expected compound — if spots overlap perfectly, that component is identified.</div>`;
+  }
+  document.getElementById('purityResultStep').innerHTML = html;
+}
+
+// ============================================================
+// SUBSTANCE LIBRARY
+// ============================================================
+function renderLibrary(filter = 'all', searchTerm = '') {
+  const grid = document.getElementById('substanceGrid');
+  let subs = ALL_SUBSTANCES;
+  if (filter !== 'all') subs = subs.filter(s => s.type === filter);
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    subs = subs.filter(s => s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q));
+  }
+  grid.innerHTML = '';
+  subs.forEach(s => {
+    const rf = s.rf !== undefined ? `Rf = ${s.rf.toFixed(2)}` : `tR = ${s.tr} min`;
+    const typeClass = s.type;
+    grid.innerHTML += `<div class="substance-card" onclick="openSubstanceModal('${s.id}','${s.type}')">
+      <div class="substance-name"><span class="color-swatch" style="background:${s.color};width:18px;height:18px;border-radius:4px"></span>${s.name}<span class="substance-type ${typeClass}">${s.type}</span></div>
+      <div class="substance-rf">${rf}</div>
+      <div class="substance-desc">${s.desc}</div>
+    </div>`;
+  });
+  if (subs.length === 0) {
+    grid.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:2rem">No substances match your search.</p>';
+  }
+}
+
+function filterLibrary() {
+  const search = document.getElementById('libSearch').value;
+  const filter = document.getElementById('libFilter').value;
+  renderLibrary(filter, search);
+}
+
+function openSubstanceModal(id, type) {
+  const s = ALL_SUBSTANCES.find(x => x.id === id && x.type === type);
+  if (!s) return;
+  const rf = s.rf !== undefined ? `<div class="rf-detail-row"><span class="rf-detail-key">Rf value:</span><span class="rf-detail-val">${s.rf.toFixed(2)}</span></div>` : `<div class="rf-detail-row"><span class="rf-detail-key">Retention time:</span><span class="rf-detail-val">${s.tr} min</span></div>`;
+  const formula = s.formula ? `<div class="rf-detail-row"><span class="rf-detail-key">Formula:</span><span class="rf-detail-val">${s.formula}</span></div>` : '';
+  const mw = s.mw ? `<div class="rf-detail-row"><span class="rf-detail-key">Mol. wt.:</span><span class="rf-detail-val">${s.mw} g/mol</span></div>` : '';
+  const bp = s.bp ? `<div class="rf-detail-row"><span class="rf-detail-key">Boiling pt.:</span><span class="rf-detail-val">${s.bp}</span></div>` : '';
+  const polarity = s.polarity ? `<div class="rf-detail-row"><span class="rf-detail-key">Polarity:</span><span class="rf-detail-val">${s.polarity}</span></div>` : '';
+  const ninhydrin = s.ninhydrin ? `<div class="rf-detail-row"><span class="rf-detail-key">Ninhydrin:</span><span class="rf-detail-val">${s.ninhydrin}</span></div>` : '';
+  const visColor = s.visColor ? `<div class="rf-detail-row"><span class="rf-detail-key">Band colour:</span><span class="rf-detail-val"><span style="color:${s.color}">■</span> ${s.visColor}</span></div>` : '';
+
+  document.getElementById('modalContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
+      <span style="width:40px;height:40px;border-radius:8px;background:${s.color};display:inline-block;box-shadow:0 0 16px ${s.color}66"></span>
+      <div>
+        <h3 style="font-family:var(--font-serif);font-size:1.4rem;font-weight:400">${s.name}</h3>
+        <span class="substance-type ${s.type}" style="font-size:0.7rem">${s.type}</span>
+      </div>
+    </div>
+    <div class="rf-detail-panel visible" style="display:block;margin-bottom:1rem">
+      ${rf}${formula}${mw}${polarity}${ninhydrin}${visColor}${bp}
+    </div>
+    <p style="font-size:0.9rem;color:var(--text-secondary)">${s.desc}</p>
+    <div style="margin-top:1rem">
+      <button class="btn btn-primary" onclick="closeModal(); switchTab('simulator');" style="font-size:0.7rem">→ Simulate</button>
+    </div>`;
+  document.getElementById('substanceModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('substanceModal').classList.remove('open');
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+let quizInitialized = false;
+let quizAnswers = {};
+let quizSubmitted = false;
+
+const QUIZ_QUESTIONS = [
+  { q: "What is the correct formula for calculating the retention factor (Rf)?", opts: ["Distance moved by substance ÷ Distance moved by solvent front","Distance moved by solvent front ÷ Distance moved by substance","Distance moved by substance × Speed of solvent","Mass of substance ÷ Volume of solvent"], ans: 0, explain: "Rf = distance moved by substance / distance moved by solvent front. It always ranges 0–1." },
+  { q: "In TLC using silica gel as the stationary phase, which substance would have the HIGHEST Rf value?", opts: ["A very polar compound","A nonpolar compound","An ionic compound","A compound with many -OH groups"], ans: 1, explain: "Nonpolar compounds have less affinity for the polar silica gel, so they spend more time in the mobile phase and travel further, giving a higher Rf." },
+  { q: "What type of chromatography is paper chromatography?", opts: ["Adsorption chromatography","Partition chromatography","Ion exchange chromatography","Size exclusion chromatography"], ans: 1, explain: "Paper chromatography is partition chromatography. The stationary phase is water trapped in the cellulose fibres. Components partition between this water and the mobile solvent." },
+  { q: "In GLC, what is the 'retention time'?", opts: ["The time the sample takes to be dissolved","The time from injection to peak maximum at the detector","The time required to prepare the column","The time the solvent takes to reach the top"], ans: 1, explain: "Retention time (tR) is the time from sample injection to the appearance of the peak maximum for a component at the detector." },
+  { q: "What is the purpose of a visualising agent in TLC?", opts: ["To speed up the movement of substances","To identify the position of colourless spots on the chromatogram","To dissolve the stationary phase","To increase the Rf values of all compounds"], ans: 1, explain: "Many compounds are colourless and invisible on a TLC plate. Visualising agents (like ninhydrin, iodine, or UV light) reveal the positions of the separated components." },
+  { q: "A student runs TLC and measures: distance to spot = 3.6 cm, solvent front = 9.0 cm. What is the Rf?", opts: ["0.25","0.36","0.40","2.50"], ans: 2, explain: "Rf = 3.6 ÷ 9.0 = 0.40" },
+  { q: "Which of the following is used as the mobile phase in Gas-Liquid Chromatography?", opts: ["Water","An organic solvent mixture","An unreactive gas (e.g., nitrogen)","A molten salt"], ans: 2, explain: "In GLC, the mobile phase is an unreactive carrier gas such as nitrogen, helium, or argon." },
+  { q: "In column chromatography, which type of compound elutes FIRST from a silica column?", opts: ["The most polar compound","The compound with highest molecular weight","The least polar compound","The compound with lowest molecular weight"], ans: 2, explain: "In adsorption column chromatography with silica (polar stationary phase), the least polar compound has the lowest affinity for the stationary phase and elutes first." },
+  { q: "Which stationary phases are mentioned in the CAPE syllabus? (Select the best answer)", opts: ["Cellulose only","Silica gel and alumina only","Cellulose, silica gel, and alumina","Activated charcoal and cellulose"], ans: 2, explain: "The CAPE syllabus (Obj. 8.4) specifically requires reference to cellulose, silica gel, and alumina as commonly used stationary phases." },
+  { q: "A pure compound is expected to give __ spot(s) on a TLC plate.", opts: ["Many coloured spots","One spot","Two spots","No spots"], ans: 1, explain: "A pure compound gives exactly ONE spot on TLC (in any given solvent system). Multiple spots indicate a mixture." },
+  { q: "In paper chromatography of plant pigments, which compound has the highest Rf value?", opts: ["Chlorophyll b","Xanthophyll","β-Carotene","Chlorophyll a"], ans: 2, explain: "β-Carotene is the most nonpolar plant pigment (no polar groups). With a nonpolar solvent (petroleum ether), it travels furthest, giving Rf ≈ 0.98." },
+  { q: "What is the main advantage of column chromatography over TLC?", opts: ["It is faster","It requires no solvent","It allows collection of larger pure amounts of separated substances","It gives more accurate Rf values"], ans: 2, explain: "Column chromatography is preparative — it allows collection of separated fractions in relatively large amounts. TLC is primarily analytical." },
+  { q: "Why is pencil (not pen) used to draw the baseline in TLC and paper chromatography?", opts: ["Pencil doesn't absorb the solvent","Ink would itself be separated into its components, obscuring the results","Pencil marks do not fade","Pencil gives a thicker, more visible line"], ans: 1, explain: "Pen ink contains dyes that would themselves be separated by the mobile phase, creating confusing spots and obscuring the actual results." },
+  { q: "In GLC, the area under a peak is proportional to:", opts: ["The boiling point of the component","The concentration (amount) of the component","The polarity of the component","The column temperature"], ans: 1, explain: "In GLC, peak area is directly proportional to the amount (concentration) of the component. This allows quantitative determination: % A = (peak area of A ÷ total area) × 100%." },
+  { q: "Ninhydrin is used as a visualising agent specifically for:", opts: ["Lipids","Carbohydrates","Amino acids","Plant pigments"], ans: 2, explain: "Ninhydrin reacts specifically with amino acids (and other primary amines) to give characteristic purple or brown/yellow coloured spots." },
+  { q: "Two compounds have Rf values of 0.45 and 0.47 in one solvent. What can be done to improve separation?", opts: ["Use a shorter TLC plate","Use two-dimensional chromatography with a second solvent","Add more sample to the spot","Increase the temperature"], ans: 1, explain: "Two-dimensional TLC uses a second different solvent in the perpendicular direction, achieving far greater resolution of compounds with similar Rf values in the first solvent." },
+  { q: "Which application of chromatography is specifically cited in the CAPE Explanatory Notes?", opts: ["Protein synthesis","Pesticide analysis","Photosynthesis measurement","Nuclear medicine"], ans: 1, explain: "The CAPE explanatory notes (Obj. 8.6) specifically cite pesticide analysis, forensic testing, and purification of natural products as applications." },
+  { q: "In GLC, a limitation is that similar compounds may have similar retention times. This is overcome by:", opts: ["Using a different stationary phase","Coupling GLC with mass spectrometry (GLC-MS)","Reducing the carrier gas flow rate","Using a longer column"], ans: 1, explain: "Coupling GLC with mass spectrometry (GLC-MS) provides a structural fingerprint for definitive identification, overcoming the limitation that similar compounds can have similar retention times." },
+  { q: "The stationary phase in GLC is:", opts: ["A carrier gas","A finely ground solid only","A high-boiling liquid supported on a porous solid","Distilled water"], ans: 2, explain: "In GLC (a form of partition chromatography), the stationary phase is a high-boiling liquid (e.g., long-chain hydrocarbon oil) coated on a porous inert solid support." },
+  { q: "An Rf value is reported as 1.15. This is:", opts: ["Possible for very fast compounds","Correct for nonpolar substances","Impossible — Rf values range from 0 to 1","Correct only in gas chromatography"], ans: 2, explain: "Rf values range from 0 to 1 by definition. A value >1 is impossible because no substance can travel further than the solvent front (which sets the denominator)." },
+  { q: "What type of chromatography is thin-layer chromatography (TLC)?", opts: ["Partition","Adsorption","Gas-liquid","Ion exchange"], ans: 1, explain: "TLC with silica or alumina is a form of adsorption chromatography. The components form bonds of varying strength with the solid surface of the stationary phase." },
+  { q: "Why must the chromatography chamber be covered during a run?", opts: ["To keep the sample in the dark","To prevent solvent evaporation and allow vapour saturation, which ensures reproducible results","To speed up the capillary action","To prevent air from dissolving in the solvent"], ans: 1, explain: "Covering the chamber prevents solvent evaporation and ensures the atmosphere above the solvent is saturated with vapour. This prevents the solvent from evaporating from the paper/plate, ensuring a consistent and reproducible separation." },
+  { q: "The % composition of component A in a GLC mixture is calculated using:", opts: ["Peak height of A ÷ Sum of all peak heights × 100","Peak area of A ÷ Sum of all peak areas × 100","Retention time of A ÷ Total run time × 100","Distance of A ÷ Solvent front × 100"], ans: 1, explain: "% of A = (Peak area of A ÷ Σ all peak areas) × 100%. Peak area (not height) is used because it accounts for both the intensity and width of the peak." },
+  { q: "Adsorption is BEST defined as:", opts: ["One substance being taken into the volume of another","One substance sticking to the SURFACE of another","Two substances dissolving in the same solvent","A substance vaporising at room temperature"], ans: 1, explain: "Adsorption means one substance sticks to the surface of another (from the Latin 'ad' = to/towards). This is distinct from absorption, where one substance is taken into the volume of another (like a sponge)." },
+  { q: "Which CAPE practical activity is specifically suggested for TLC?", opts: ["Separation of metal ions by electrophoresis","Use of TLC to investigate mixtures; visualisation in iodine chamber; calculation of Rf","Distillation of sea water","Titration of amino acid solutions"], ans: 1, explain: "The CAPE explanatory notes specifically suggest: 'The use of TLC to investigate mixtures and pure compounds (plant extracts, dyes and inks). Visualisation may be done using an iodine chamber. Calculate Rf values.'" },
+];
+
+function initQuiz() {
+  quizInitialized = true;
+  quizAnswers = {};
+  quizSubmitted = false;
+  const area = document.getElementById('quizArea');
+  let html = '';
+  QUIZ_QUESTIONS.forEach((q, i) => {
+    html += `<div class="quiz-question" id="qq${i}">
+      <div class="quiz-q-num">Question ${i + 1} of ${QUIZ_QUESTIONS.length} — <span class="badge badge-objective">CAPE Obj.</span></div>
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((opt, j) => `<label class="quiz-option" id="opt_${i}_${j}">
+          <input type="radio" name="q${i}" value="${j}" onchange="recordAnswer(${i}, ${j})"> ${opt}
+        </label>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="fb${i}"></div>
+    </div>`;
+  });
+  html += `<div style="text-align:center;margin-top:1.5rem">
+    <button class="btn btn-primary" onclick="submitQuiz()" id="submitBtn">Submit Quiz</button>
+    <button class="btn btn-secondary" onclick="resetQuiz()" style="margin-left:8px">↺ Retry</button>
+  </div>
+  <div id="quizScoreArea" style="margin-top:2rem"></div>`;
+  area.innerHTML = html;
+}
+
+function recordAnswer(qIdx, optIdx) {
+  quizAnswers[qIdx] = optIdx;
+}
+
+function submitQuiz() {
+  if (quizSubmitted) return;
+  quizSubmitted = true;
+  let score = 0;
+
+  QUIZ_QUESTIONS.forEach((q, i) => {
+    const selected = quizAnswers[i];
+    const fb = document.getElementById('fb' + i);
+    fb.classList.add('show');
+
+    for (let j = 0; j < q.opts.length; j++) {
+      const optEl = document.getElementById(`opt_${i}_${j}`);
+      if (j === q.ans) optEl.classList.add('correct');
+      else if (j === selected && selected !== q.ans) optEl.classList.add('wrong');
+    }
+
+    if (selected === q.ans) {
+      score++;
+      fb.classList.add('correct');
+      fb.textContent = '✓ Correct! ' + q.explain;
+    } else {
+      fb.classList.add('wrong');
+      const selectedText = selected !== undefined ? q.opts[selected] : 'Not answered';
+      fb.textContent = `✗ Incorrect. You selected: "${selectedText}". Correct: "${q.opts[q.ans]}". ${q.explain}`;
+    }
+  });
+
+  const pct = Math.round(score / QUIZ_QUESTIONS.length * 100);
+  const grade = pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good — review weak areas.' : 'Review the notes and try again.';
+  document.getElementById('quizScoreArea').innerHTML = `
+    <div class="quiz-score-board">
+      <div class="score-circle">${pct}%</div>
+      <h3 style="font-family:var(--font-serif);font-size:1.5rem;margin-bottom:0.5rem">${grade}</h3>
+      <p style="color:var(--text-secondary)">You scored <strong style="color:var(--accent)">${score}</strong> out of <strong>${QUIZ_QUESTIONS.length}</strong> questions correctly.</p>
+      <button class="btn btn-secondary" onclick="resetQuiz()" style="margin-top:1rem">↺ Try Again</button>
+    </div>`;
+  document.getElementById('quizScoreArea').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetQuiz() {
+  quizInitialized = false;
+  quizAnswers = {};
+  quizSubmitted = false;
+  initQuiz();
+}
+
+// ============================================================
+// INIT ON LOAD
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  tlcUpdateSubstances();
+  paperUpdateSubstances();
+  columnUpdateSubstances();
+  glcUpdateSubstances();
+  renderLibrary();
+  drawPaper(0, []);
+  drawColumn(0, []);
+  drawGLC([], [], [], 1);
+
+  // Init GLC temp display
+  document.getElementById('glcTempVal').textContent = '150°C';
+});
+</script>
+</body>
+</html>
